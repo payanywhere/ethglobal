@@ -7,7 +7,7 @@ const SATOSHI = localFont({
   src: "./Satoshi-Variable.ttf",
   variable: "--font-satoshi",
   display: "swap",
-  fallback: ['Satoshi', 'SF Pro', 'system-ui', 'arial'],
+  fallback: ["Satoshi", "SF Pro", "system-ui", "arial"]
 })
 
 export const metadata: Metadata = {

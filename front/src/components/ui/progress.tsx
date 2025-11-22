@@ -2,7 +2,7 @@
 
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 
-import * as React from "react"
+import type * as React from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -18,7 +18,7 @@ function Progress({
       data-slot="progress"
       className={cn(
         "relative h-4 w-full overflow-hidden rounded-base border-2 border-border bg-secondary-background",
-        className,
+        className
       )}
       {...props}
     >
