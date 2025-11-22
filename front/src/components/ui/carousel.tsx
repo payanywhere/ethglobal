@@ -124,6 +124,7 @@ function Carousel({
         canScrollNext
       }}
     >
+      {/* biome-ignore lint/a11y/useSemanticElements: role="region" is needed for aria-roledescription support on carousel */}
       <div
         onKeyDownCapture={handleKeyDown}
         className={cn("relative", className)}
@@ -155,6 +156,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   const { orientation } = useCarousel()
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: fieldset is semantically incorrect for carousel slides; role="group" is appropriate here
     <div
       data-slot="carousel-item"
       role="group"
