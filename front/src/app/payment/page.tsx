@@ -1,12 +1,12 @@
 "use client"
 
+import { AnimatePresence, motion } from "framer-motion"
+import { ArrowLeft, ExternalLink, Loader2, QrCode } from "lucide-react"
 import Image from "next/image"
 import QRCode from "qrcode"
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import NavBar from "@/app/components/NavBar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Card,
   CardContent,
@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, QrCode, ExternalLink, ArrowLeft, Sparkles } from "lucide-react"
 
 interface PaymentResponse {
   preference_id: string
@@ -147,15 +147,14 @@ export default function PaymentPage() {
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         className="p-4 rounded-base border-2 border-border bg-red-50 dark:bg-red-950 shadow-shadow"
                       >
-                        <p className="text-sm font-heading text-red-600 dark:text-red-400">{error}</p>
+                        <p className="text-sm font-heading text-red-600 dark:text-red-400">
+                          {error}
+                        </p>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  <motion.div
-                    variants={itemVariants}
-                    className="space-y-2"
-                  >
+                  <motion.div variants={itemVariants} className="space-y-2">
                     <Label htmlFor="amount" className="text-base font-heading">
                       Amount (USD)
                     </Label>
@@ -180,10 +179,7 @@ export default function PaymentPage() {
                     </p>
                   </motion.div>
 
-                  <motion.div
-                    variants={itemVariants}
-                    className="space-y-2"
-                  >
+                  <motion.div variants={itemVariants} className="space-y-2">
                     <Label htmlFor="description" className="text-base font-heading">
                       Description (Optional)
                     </Label>
@@ -200,10 +196,7 @@ export default function PaymentPage() {
                     </p>
                   </motion.div>
 
-                  <motion.div
-                    variants={itemVariants}
-                    className="space-y-2"
-                  >
+                  <motion.div variants={itemVariants} className="space-y-2">
                     <Label htmlFor="email" className="text-base font-heading">
                       Email (Optional)
                     </Label>
@@ -219,7 +212,7 @@ export default function PaymentPage() {
                       Customer email address for notifications
                     </p>
                   </motion.div>
-            </CardContent>
+                </CardContent>
                 <CardFooter className="flex flex-col gap-4">
                   <motion.div
                     whileHover={{ x: 4, y: 4 }}
@@ -311,10 +304,7 @@ export default function PaymentPage() {
                       )}
                     </AnimatePresence>
 
-                    <motion.div
-                      variants={itemVariants}
-                      className="w-full space-y-3"
-                    >
+                    <motion.div variants={itemVariants} className="w-full space-y-3">
                       <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
@@ -351,11 +341,7 @@ export default function PaymentPage() {
                         className="w-full min-h-12 text-lg font-heading"
                       >
                         {payment && (
-                          <a
-                            href={payment.init_point}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
+                          <a href={payment.init_point} target="_blank" rel="noopener noreferrer">
                             Open Mercado Pago Checkout
                             <ExternalLink className="w-5 h-5" />
                           </a>
@@ -370,11 +356,7 @@ export default function PaymentPage() {
                     whileTap={{ x: 0, y: 0 }}
                     className="w-full"
                   >
-                    <Button
-                      onClick={resetPayment}
-                      variant="neutral"
-                      className="w-full"
-                    >
+                    <Button onClick={resetPayment} variant="neutral" className="w-full">
                       <ArrowLeft />
                       Create Another Payment
                     </Button>

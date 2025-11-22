@@ -1,11 +1,11 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import NavBar from "./components/NavBar"
-import Image from "next/image"
-import Marquee from "@/components/ui/marquee"
 import { ArrowRightIcon } from "lucide-react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useCallback } from "react"
+import { Button } from "@/components/ui/button"
+import Marquee from "@/components/ui/marquee"
+import NavBar from "./components/NavBar"
 
 const paymentBenefits = [
   "Global Payments",
@@ -16,18 +16,21 @@ const paymentBenefits = [
   "Easy Integration",
   "Multi-Currency",
   "Instant Processing",
-  "24/7 Support",
+  "24/7 Support"
 ]
 
 export default function Home() {
   /** Navigation setup */
-  const router = useRouter();
-  
+  const router = useRouter()
+
   /** Login redirect */
-  const handleButtonClick = useCallback((e: React.MouseEvent<HTMLButtonElement>)=>{
-    e.preventDefault();
-    router.push("/login");
-  }, [router]);
+  const handleButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault()
+      router.push("/login")
+    },
+    [router]
+  )
 
   return (
     <main className="overflow-x-hidden">
@@ -40,7 +43,11 @@ export default function Home() {
           <p className="text-lg md:text-xl text-gray-600">
             Any token, any fiat currency, in one place.
           </p>
-          <Button variant={"default"} className="mt-6 w-fit min-w-60 min-h-12 text-lg font-bold" onClick={handleButtonClick}>
+          <Button
+            variant={"default"}
+            className="mt-6 w-fit min-w-60 min-h-12 text-lg font-bold"
+            onClick={handleButtonClick}
+          >
             Get Started
             <ArrowRightIcon className="min-w-5 min-h-5" />
           </Button>
@@ -58,10 +65,7 @@ export default function Home() {
       </section>
       <section className="marquee-section w-full overflow-visible py-8 my-8">
         <div className="w-full overflow-visible">
-          <Marquee
-            items={paymentBenefits}
-            className="rotate-[-1deg] origin-top"
-          />
+          <Marquee items={paymentBenefits} className="rotate-[-1deg] origin-top" />
         </div>
       </section>
     </main>

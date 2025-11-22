@@ -11,15 +11,14 @@ export function PrivyAuthProvider({ children }: { children: React.ReactNode }) {
         appearance: {
           theme: "light",
           accentColor: "#00D696",
-          logo: "/logo.png",
+          logo: "/logo.png"
         },
         embeddedWallets: {
-          createOnLogin: "users-without-wallets",
-        },
+          createOnLogin: "users-without-wallets"
+        }
       }}
     >
       {children}
     </PrivyProvider>
   )
 }
-

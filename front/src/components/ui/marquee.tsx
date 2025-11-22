@@ -1,6 +1,6 @@
 export default function Marquee({
   items,
-  className = "",
+  className = ""
 }: {
   items: string[]
   className?: string
