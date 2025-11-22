@@ -9,7 +9,8 @@ import {
   BarChart3,
   Settings,
   Wallet,
-  LogOut
+  LogOut,
+  Menu
 } from "lucide-react"
 import {
   Sidebar,
@@ -23,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarRail,
   SidebarTrigger
 } from "@/components/ui/sidebar"
 import Image from "next/image"
@@ -73,22 +75,25 @@ export default function DashboardLayout({
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2 px-2 py-2">
-            <Image
-              src="/logo.svg"
-              alt="PayAnyWhere Logo"
-              width={32}
-              height={32}
-              className="w-8 h-8"
-            />
-            <div className="flex flex-col">
-              <span className="font-heading text-lg">PayAnyWhere</span>
-              <span className="text-xs text-foreground/50">Merchant Portal</span>
+          <div className="flex items-center justify-between gap-2 px-2 py-2 md:py-1">
+            <div className="flex items-center gap-3 md:gap-3 min-w-0">
+              <Image
+                src="/logo.svg"
+                alt="PayAnyWhere Logo"
+                width={32}
+                height={32}
+                className="w-8 h-8 shrink-0"
+              />
+              <div className="flex flex-col justify-center gap-[2px] min-w-0 h-9">
+                <span className="font-heading text-base md:text-md leading-tight">PayAnyWhere</span>
+                <span className="text-xs md:text-[12px] text-foreground/50 leading-tight">Merchant Portal</span>
+              </div>
             </div>
+            <SidebarTrigger className="h-7 w-7 md:h-7 md:w-7 md:ml-3 border-0 bg-transparent shadow-none hover:bg-main hover:text-main-foreground p-0 shrink-0" />
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
+          <SidebarGroup className="mt-4">
             <SidebarGroupContent>
               <SidebarMenu>
                 {menuItems.map((item) => (
@@ -110,21 +115,35 @@ export default function DashboardLayout({
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <div className="flex items-center justify-between gap-2 px-2">
-            <SidebarMenu className="flex-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-                  <LogOut />
-                  <span>Logout</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-            <SidebarTrigger className="h-7 w-7 border-0 bg-transparent shadow-none hover:bg-main hover:text-main-foreground p-0 flex-shrink-0" />
-          </div>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                <LogOut />
+                <span>Logout</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarFooter>
+        <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
+        {/* Mobile-only navbar */}
+        <header className="flex md:hidden h-16 shrink-0 items-center justify-between gap-2 border-b-2 border-b-border px-4">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/logo.svg"
+              alt="PayAnyWhere Logo"
+              width={24}
+              height={24}
+              className="w-6 h-6"
+            />
+            <span className="font-heading text-base">PayAnyWhere</span>
+          </div>
+          <SidebarTrigger className="h-7 w-7 border-0 bg-transparent shadow-none hover:bg-main hover:text-main-foreground p-0">
+            <Menu className="h-5 w-5" />
+          </SidebarTrigger>
+        </header>
+        <div className="flex flex-1 flex-col gap-6 p-6">
           {children}
         </div>
       </SidebarInset>
