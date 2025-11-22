@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic"
 
 import { motion } from "framer-motion"
 import { CheckCircle2, Coins, CreditCard, Download, Sparkles } from "lucide-react"
+import { jsPDF } from "jspdf"
 import Image from "next/image"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
@@ -13,26 +14,109 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 function ConfirmedContent() {
   const params = useSearchParams()
   const method = params.get("method") || "unknown"
+  const paymentId = params.get("payment_id") || `PAY-${Date.now()}`
+  const amount = params.get("amount") || "N/A"
 
   const isCrypto = method.toLowerCase() === "crypto"
   const _MethodIcon = isCrypto ? Coins : CreditCard
 
   const handleSaveReceipt = () => {
-    // Generate and download receipt
-    const receiptData = {
-      method: method.toUpperCase(),
-      date: new Date().toLocaleString(),
-      status: "Completed"
+    try {
+      const doc = new jsPDF()
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const pageHeight = doc.internal.pageSize.getHeight()
+      const margin = 20
+      
+      // Colors matching neobrutalism theme
+      const textColor = 0 // black
+      const lightGrayR = 128
+      const lightGrayG = 128
+      const lightGrayB = 128
+      const borderColor = 0 // black
+
+      // Calculate center position for all content
+      const contentWidth = 120
+      const startX = (pageWidth - contentWidth) / 2
+      let yPos = 40
+
+      // Header with company name and receipt title - centered
+      doc.setFontSize(24)
+      doc.setFont("helvetica", "bold")
+      doc.setTextColor(textColor, textColor, textColor)
+      doc.text("PayAnyWhere", pageWidth / 2, yPos, { align: "center" })
+      yPos += 12
+
+      doc.setFontSize(16)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(lightGrayR, lightGrayG, lightGrayB)
+      doc.text("Receipt", pageWidth / 2, yPos, { align: "center" })
+      yPos += 25
+
+      // Transaction details as a table - centered
+      const tableData = [
+        { label: "ID", value: paymentId },
+        { label: "Method", value: method.toUpperCase() },
+        { label: "Date", value: new Date().toLocaleString() },
+        { label: "Amount", value: amount !== "N/A" ? `$${amount}` : "N/A" }
+      ]
+
+      const rowHeight = 12
+      const cellPadding = 8
+      const labelWidth = 45
+      const tableHeight = rowHeight * tableData.length
+      const tableTopY = yPos
+
+      // Set up drawing properties
+      doc.setDrawColor(borderColor, borderColor, borderColor)
+      doc.setLineWidth(0.5)
+
+      // Draw outer table border
+      doc.rect(startX, tableTopY, contentWidth, tableHeight)
+
+      // Draw vertical separator line between columns
+      const columnSeparatorX = startX + labelWidth + (cellPadding * 2)
+      doc.line(columnSeparatorX, tableTopY, columnSeparatorX, tableTopY + tableHeight)
+
+      // Draw rows and content
+      tableData.forEach(({ label, value }, index) => {
+        const currentRowY = tableTopY + (index * rowHeight)
+        const textBaseY = currentRowY + (rowHeight / 2) + 3
+
+        // Draw horizontal separator line between rows (except for first row)
+        if (index > 0) {
+          doc.line(startX, currentRowY, startX + contentWidth, currentRowY)
+        }
+
+        // Draw label in left column
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(10)
+        doc.setTextColor(lightGrayR, lightGrayG, lightGrayB)
+        doc.text(label, startX + cellPadding, textBaseY, { align: "left" })
+
+        // Draw value in right column
+        doc.setFont("helvetica", "bold")
+        doc.setFontSize(10)
+        doc.setTextColor(textColor, textColor, textColor)
+        const valueStartX = columnSeparatorX + cellPadding
+        const valueMaxWidth = contentWidth - labelWidth - (cellPadding * 4)
+        doc.text(value, valueStartX, textBaseY, { align: "left", maxWidth: valueMaxWidth })
+      })
+
+      yPos = tableTopY + tableHeight + 20
+
+      // Footer centered
+      doc.setFontSize(9)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(lightGrayR, lightGrayG, lightGrayB)
+      doc.text("Thank you for using PayAnyWhere", pageWidth / 2, yPos, { align: "center" })
+
+      // Save the PDF
+      const fileName = `receipt-${paymentId}-${Date.now()}.pdf`
+      doc.save(fileName)
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      alert("Failed to generate receipt. Please try again.")
     }
-    const blob = new Blob([JSON.stringify(receiptData, null, 2)], { type: "application/json" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `payment-receipt-${Date.now()}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
   }
 
   return (
