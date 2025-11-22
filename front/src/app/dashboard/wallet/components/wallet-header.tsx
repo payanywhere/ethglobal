@@ -1,6 +1,7 @@
 import { ArrowDownToLine, ArrowUpRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface WalletHeaderProps {
   totalValueUSD: number
@@ -17,7 +18,7 @@ export function WalletHeader({ totalValueUSD, loading, onSend, onReceive }: Wall
           <div className="space-y-2">
             <h2 className="text-sm font-heading text-foreground/50">Total Balance</h2>
             {loading ? (
-              <div className="h-10 w-32 bg-foreground/10 animate-pulse rounded" />
+              <Skeleton className="h-10 w-40" />
             ) : (
               <p className="text-3xl font-heading font-bold">
                 ${totalValueUSD.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

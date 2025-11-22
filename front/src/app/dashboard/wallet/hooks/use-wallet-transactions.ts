@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { fetchWalletActivity, type ActivityItem } from "@/services/dune-sim-activity"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
 
@@ -139,14 +139,29 @@ export function useWalletTransactions(address: string | null) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isLoadingRef = useRef(false)
+  const lastAddressRef = useRef<string | null>(null)
 
   const loadTransactions = useCallback(async () => {
+    // Prevent duplicate calls
+    if (isLoadingRef.current) {
+      return
+    }
+
+    // Skip if address hasn't changed
+    if (address === lastAddressRef.current && lastAddressRef.current !== null) {
+      return
+    }
+
     if (!address) {
       setTransactions([])
+      lastAddressRef.current = null
       return
     }
 
     try {
+      isLoadingRef.current = true
+      lastAddressRef.current = address
       setLoading(true)
       setError(null)
 
@@ -166,12 +181,16 @@ export function useWalletTransactions(address: string | null) {
       setError(friendlyError)
     } finally {
       setLoading(false)
+      isLoadingRef.current = false
     }
   }, [address])
 
   useEffect(() => {
-    loadTransactions()
-  }, [loadTransactions])
+    // Only load if address changed
+    if (address !== lastAddressRef.current) {
+      loadTransactions()
+    }
+  }, [address, loadTransactions])
 
   return {
     transactions,
