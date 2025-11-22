@@ -1,9 +1,11 @@
 "use client"
 
-import { memo, useCallback, useState } from "react"
 import { Loader2, QrCode } from "lucide-react"
 import Image from "next/image"
 import QRCode from "qrcode"
+import { memo, useCallback, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -12,10 +14,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
 
 interface PaymentFormOverlayProps {
   open: boolean
@@ -129,9 +129,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
           <div className="space-y-6 py-4">
             {error && (
               <div className="p-4 rounded-base border-2 border-border bg-red-50 dark:bg-red-950 shadow-shadow">
-                <p className="text-sm font-heading text-red-600 dark:text-red-400">
-                  {error}
-                </p>
+                <p className="text-sm font-heading text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
 
@@ -214,19 +212,13 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
 
                   <div className="w-full space-y-3">
                     <div className="p-4 rounded-base border-2 border-border bg-secondary-background space-y-2 shadow-shadow">
-                      <p className="text-sm font-heading text-foreground/50">
-                        Payment Amount
-                      </p>
-                      <p className="text-2xl font-bold font-heading">
-                        ${amount.toFixed(2)} USD
-                      </p>
+                      <p className="text-sm font-heading text-foreground/50">Payment Amount</p>
+                      <p className="text-2xl font-bold font-heading">${amount.toFixed(2)} USD</p>
                     </div>
 
                     {description && (
                       <div className="p-4 rounded-base border-2 border-border bg-secondary-background space-y-2 shadow-shadow">
-                        <p className="text-sm font-heading text-foreground/50">
-                          Description
-                        </p>
+                        <p className="text-sm font-heading text-foreground/50">Description</p>
                         <p className="text-base font-base">{description}</p>
                       </div>
                     )}
@@ -312,4 +304,3 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
     </Dialog>
   )
 })
-

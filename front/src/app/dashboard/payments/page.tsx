@@ -1,16 +1,10 @@
 "use client"
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react"
+import { CheckCircle2, Clock, ExternalLink, Loader2, Plus } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Plus, ExternalLink, Loader2, CheckCircle2, Clock } from "lucide-react"
+import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -19,8 +13,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { PaymentFormOverlay } from "./payment-form-overlay"
 import { cn } from "@/lib/utils"
+import { PaymentFormOverlay } from "./payment-form-overlay"
 
 interface PaymentRecord {
   payment_id: string
@@ -68,23 +62,14 @@ const PaymentRow = memo(({ payment }: { payment: PaymentRecord }) => {
 
   return (
     <TableRow className="bg-background hover:bg-secondary-background border-b border-border">
-      <TableCell className="font-medium text-foreground">
-        {payment.payment_id}
-      </TableCell>
-      <TableCell className="text-foreground">
-        ${payment.amount_usd.toFixed(2)}
-      </TableCell>
+      <TableCell className="font-medium text-foreground">{payment.payment_id}</TableCell>
+      <TableCell className="text-foreground">${payment.amount_usd.toFixed(2)}</TableCell>
       <TableCell className="text-foreground">
         <StatusBadge status={payment.status} />
       </TableCell>
       <TableCell className="text-foreground">
         {payment.qr_url ? (
-          <Button
-            variant="noShadow"
-            size="sm"
-            onClick={handleViewPayment}
-            className="gap-1"
-          >
+          <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
             <ExternalLink className="h-3 w-3" />
             View
           </Button>
@@ -105,10 +90,7 @@ export default function PaymentsPage() {
   const [error, setError] = useState<string | null>(null)
 
   // Check if form should be open from URL params
-  const isFormOpen = useMemo(
-    () => searchParams.get("create") === "true",
-    [searchParams]
-  )
+  const isFormOpen = useMemo(() => searchParams.get("create") === "true", [searchParams])
 
   // Memoized merchant ID
   const merchantId = useMemo(() => "merchant01", [])
@@ -242,12 +224,7 @@ export default function PaymentsPage() {
           ) : error ? (
             <div className="py-12 text-center">
               <p className="text-red-500">{error}</p>
-              <Button
-                onClick={fetchPayments}
-                variant="neutral"
-                className="mt-4"
-                size="sm"
-              >
+              <Button onClick={fetchPayments} variant="neutral" className="mt-4" size="sm">
                 Retry
               </Button>
             </div>
@@ -291,4 +268,3 @@ export default function PaymentsPage() {
     </div>
   )
 }
-
