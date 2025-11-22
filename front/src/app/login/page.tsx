@@ -3,8 +3,8 @@
 import { usePrivy } from "@privy-io/react-auth"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import NavBar from "../components/NavBar"
 import { Button } from "@/components/ui/button"
+import NavBar from "../components/NavBar"
 
 export default function LoginPage() {
   const { ready, authenticated, login } = usePrivy()

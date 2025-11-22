@@ -7,15 +7,13 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": [
-      "**/*.css"
-    ],
     "includes": [
       "**",
       "!node_modules",
       "!.next",
       "!dist",
-      "!build"
+      "!build",
+      "!**/*.css"
     ]
   },
   "formatter": {

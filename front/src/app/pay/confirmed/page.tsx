@@ -1,21 +1,21 @@
 "use client"
 export const dynamic = "force-dynamic"
 
+import { motion } from "framer-motion"
+import { CheckCircle2, Coins, CreditCard, Download, Sparkles } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import { motion } from "framer-motion"
-import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, Sparkles, Coins, CreditCard, Download } from "lucide-react"
 
 function ConfirmedContent() {
   const params = useSearchParams()
   const method = params.get("method") || "unknown"
 
   const isCrypto = method.toLowerCase() === "crypto"
-  const MethodIcon = isCrypto ? Coins : CreditCard
+  const _MethodIcon = isCrypto ? Coins : CreditCard
 
   const handleSaveReceipt = () => {
     // Generate and download receipt
@@ -75,26 +75,30 @@ function ConfirmedContent() {
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
                 >
-                            <motion.div
-            className="flex justify-center"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          >
-            <motion.div
-              className="w-24 h-24 rounded-full border-4 border-border bg-chart-1 flex items-center justify-center shadow-shadow"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <CheckCircle2 className="w-12 h-12 text-main-foreground" />
-            </motion.div>
-          </motion.div>
+                  <motion.div
+                    className="flex justify-center"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  >
+                    <motion.div
+                      className="w-24 h-24 rounded-full border-4 border-border bg-chart-1 flex items-center justify-center shadow-shadow"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <CheckCircle2 className="w-12 h-12 text-main-foreground" />
+                    </motion.div>
+                  </motion.div>
                 </motion.div>
                 <CardTitle className="text-3xl md:text-4xl font-heading">
                   Payment Successful!
                 </CardTitle>
                 <CardDescription className="text-base font-base">
-                  Your payment via <span className="font-heading font-bold text-foreground">{method.toUpperCase()}</span> has been processed successfully.
+                  Your payment via{" "}
+                  <span className="font-heading font-bold text-foreground">
+                    {method.toUpperCase()}
+                  </span>{" "}
+                  has been processed successfully.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -161,10 +165,7 @@ function LoadingFallback() {
   return (
     <main className="min-h-screen">
       <nav className="flex items-center justify-center p-6 mb-4">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-lg font-heading text-foreground"
-        >
+        <Link href="/" className="flex items-center gap-2 text-lg font-heading text-foreground">
           <Image
             src="/logo.svg"
             alt="PayAnyWhere Logo"
