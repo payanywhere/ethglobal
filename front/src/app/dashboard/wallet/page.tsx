@@ -4,6 +4,7 @@ import { useCallback, useState } from "react"
 import { WalletHeader } from "./components/wallet-header"
 import { TokenBalancesList } from "./components/token-balances-list"
 import { TransactionHistory } from "./components/transaction-history"
+import { ReceiveOverlay } from "./components/receive-overlay"
 import { usePrivyWallet } from "./hooks/use-privy-wallet"
 import { useWalletBalances } from "./hooks/use-wallet-balances"
 import { useWalletTransactions } from "./hooks/use-wallet-transactions"
@@ -36,9 +37,7 @@ export default function WalletPage() {
   }, [])
 
   const handleReceive = useCallback(() => {
-    // TODO: Implement receive modal (show QR code)
     setShowReceiveModal(true)
-    console.log("Receive clicked")
   }, [])
 
   if (!ready) {
@@ -105,6 +104,13 @@ export default function WalletPage() {
           address={walletAddress}
         />
       </div>
+
+      {/* Receive Overlay */}
+      <ReceiveOverlay
+        open={showReceiveModal}
+        onOpenChange={setShowReceiveModal}
+        address={walletAddress}
+      />
     </div>
   )
 }
