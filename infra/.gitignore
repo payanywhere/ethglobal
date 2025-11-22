@@ -1,0 +1,39 @@
+# Terraform directories
+**/.terraform/*
+**/.terraform.lock.hcl
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Variable definitions (sensitive)
+*.tfvars
+*.tfvars.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Module and provider archives
+*.zip
+*.tar.gz
+
+# Local environment configs
+.env
+.env.*
+
+# Backup and temp files
+*.backup
+*.bak
+*.tmp
+*.swp
+
+# Mac and Windows junk
+.DS_Store
+Thumbs.db

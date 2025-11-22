@@ -1,0 +1,99 @@
+substitutions:
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+  _DEPLOY_REGION: us-central1
+  _SERVICE_NAME: back-service
+  _PROJECT_ID: payanywhere
+  _ARTIFACT_REPO: back
+
+steps:
+  # 1. Generate .env file
+  - name: 'bash'
+    id: CreateEnv
+    entrypoint: bash
+    dir: 'back'
+    env:
+      - APP_ENV=${_APP_ENV}
+      - MONGO_URI=${_MONGO_URI}
+    args:
+      - -c
+      - |
+        echo "Creating .env file..."
+        echo "APP_ENV=${_APP_ENV}" > .env
+        echo "NODE_ENV=production" >> .env
+        echo "MONGO_URI=${_MONGO_URI}" >> .env
+        echo ".env generated in /back:"
+        cat .env
+
+  # 2. Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build
+    dir: 'back'
+    args: [
+      'build',
+      '--no-cache',
+      '-t',
+      '${_AR_HOSTNAME}/${_PROJECT_ID}/${_ARTIFACT_REPO}/${_SERVICE_NAME}:$COMMIT_SHA',
+      '-f', 'Dockerfile',
+      '--build-arg', 'APP_ENV=${_APP_ENV}',
+      '--build-arg', 'NODE_ENV=production',
+      '--build-arg', 'MONGO_URI=${_MONGO_URI}',
+      '.'
+    ]
+
+  # 3. Push image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push
+    args: [
+      'push',
+      '${_AR_HOSTNAME}/${_PROJECT_ID}/${_ARTIFACT_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+    ]
+
+  # 4. Verify pushed image
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: Verify
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud artifacts docker images list \
+          ${_AR_HOSTNAME}/${_PROJECT_ID}/${_ARTIFACT_REPO} \
+          --include-tags \
+          --project=${_PROJECT_ID}
+
+  # 5. Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: Deploy
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud run deploy ${_SERVICE_NAME} \
+          --image=${_AR_HOSTNAME}/${_PROJECT_ID}/${_ARTIFACT_REPO}/${_SERVICE_NAME}:$COMMIT_SHA \
+          --region=${_DEPLOY_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --set-env-vars '
+            APP_ENV=${_APP_ENV},
+            NODE_ENV=production,
+            MONGO_URI=${_MONGO_URI}
+          ' \
+          --project=${_PROJECT_ID}
+
+  # 6. Get deployed backend URL
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: GetURL
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        svc_url=$(gcloud run services describe ${_SERVICE_NAME} \
+          --region=${_DEPLOY_REGION} \
+          --project=${_PROJECT_ID} \
+          --format='value(status.url)')
+        echo "Backend Service URL: ${svc_url}"
+
+images:
+  - '${_AR_HOSTNAME}/${_PROJECT_ID}/${_ARTIFACT_REPO}/${_SERVICE_NAME}:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

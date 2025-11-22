@@ -1,0 +1,59 @@
+substitutions:
+  _PROJECT_ID: payanywhere
+  _TF_STATE_BUCKET: paw-tf-state-dev
+  _TF_VARS_FILE: envs/dev.tfvars
+  _SA_SECRET_NAME: paw-terraform-sa-dev-key
+  _TERRAFORM_DIR: infra
+
+steps:
+  # 1. Get credentials from Secret Manager
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "🔹 Getting Terraform credentials..."
+        gcloud secrets versions access latest \
+          --secret=${_SA_SECRET_NAME} \
+          --project=${_PROJECT_ID} > /workspace/sa-key.json
+        echo "✅ Credentials obtained successfully"
+    id: 'get-credentials'
+
+  # 2. Execute Terraform
+  - name: hashicorp/terraform:1.7.5
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        echo "🔹 Setting up environment..."
+        export GOOGLE_APPLICATION_CREDENTIALS=/workspace/sa-key.json
+        
+        cd ${_TERRAFORM_DIR}
+        
+        echo "🔹 Initializing Terraform..."
+        terraform init \
+          -input=false \
+          -backend-config="bucket=${_TF_STATE_BUCKET}" \
+          -backend-config="prefix=terraform/state"
+        
+        echo "🔹 Validating configuration..."
+        terraform validate -no-color
+        
+        echo "🔹 Generating execution plan..."
+        terraform plan \
+          -input=false \
+          -var-file="${_TF_VARS_FILE}" \
+          -out=tfplan
+          
+        echo "🔹 Showing changes..."
+        terraform show -no-color tfplan
+        
+        echo "🚀 Applying changes..."
+        terraform apply -input=false -auto-approve tfplan
+        
+        echo "✅ Infrastructure deployed successfully"
+    id: 'terraform-apply'
+
+timeout: 1200s
+options:
+  logging: CLOUD_LOGGING_ONLY

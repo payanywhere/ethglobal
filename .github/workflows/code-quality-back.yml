@@ -1,0 +1,37 @@
+name: Backend Code Quality
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'back/**'
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'back/**'
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run Biome Check
+        run: bunx biome check src
