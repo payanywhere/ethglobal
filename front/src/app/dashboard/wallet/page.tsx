@@ -7,9 +7,7 @@ export default function WalletPage() {
     <div className="space-y-6">
       <div className="space-y-1">
         <h1 className="text-3xl font-heading font-bold">Wallet</h1>
-        <p className="text-foreground/50 text-sm">
-          Manage your crypto wallet and transactions
-        </p>
+        <p className="text-foreground/50 text-sm">Manage your crypto wallet and transactions</p>
       </div>
 
       <Card>
@@ -24,4 +22,3 @@ export default function WalletPage() {
     </div>
   )
 }
-

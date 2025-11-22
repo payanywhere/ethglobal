@@ -2,7 +2,7 @@
 
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { PanelLeftIcon, Menu, X } from "lucide-react"
+import { Menu, PanelLeftIcon, X } from "lucide-react"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
+const _SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -240,7 +240,12 @@ function Sidebar({
   )
 }
 
-function SidebarTrigger({ className, onClick, children, ...props }: React.ComponentProps<typeof Button>) {
+function SidebarTrigger({
+  className,
+  onClick,
+  children,
+  ...props
+}: React.ComponentProps<typeof Button>) {
   const { toggleSidebar, isMobile, openMobile, open } = useSidebar()
   const isOpen = isMobile ? openMobile : open
 
