@@ -14,6 +14,8 @@ This frontend is part of the PayAnyWhere monorepo and provides:
 * A **client payment interface** for scanning QR codes and completing transactions.
 * A consistent, responsive design built with **Next.js**, **TypeScript**, and **TailwindCSS**.
 
+![Diagram](.doc/resources/diagram.png)
+
 ## Tech Stack
 
 * **Framework:** [Next.js 16](https://nextjs.org/)
