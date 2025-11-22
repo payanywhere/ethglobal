@@ -11,6 +11,10 @@ This repository contains the Solidity smart contracts for the PayAnyWhere paymen
 
 - **PayAnyWhereFeeComposer.sol** — Receives USDC cross-chain payments, to a composer contract in polygon that takes a configurable fee (in basis points), sends the fee to the PayAnyWhere treasury, and supplies both fee and net amount to Aave for yield. 
 
+## Deployed Address on Polygon mainnet
+
+[0x9589b37aB31d25D1cB8677064ac19b5b83CB334D](https://polygonscan.com/address/0x9589b37aB31d25D1cB8677064ac19b5b83CB334D)
+
 ## Technologies Used
 
 - **Solidity** — Smart contract language (v0.8.20+)
@@ -51,7 +55,6 @@ forge script script/DeployPayAnyWhereFeeComposer.s.sol:DeployPayAnyWhereFeeCompo
 contracts/
 ├── src/                    # Solidity sources
 │   ├── PayAnyWhereFeeComposer.sol
-│   └── PayAnyWhereSender.sol
 ├── script/                 # Deployment & automation scripts
 │   ├── PayAnyWhereSender.s.sol
 │   └── DeployPayAnyWhereFeeComposer.s.sol
