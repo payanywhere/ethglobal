@@ -13,7 +13,13 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'w.wallhaven.cc', port: '', pathname: '/**' },
       { protocol: 'https', hostname: 'www.googletagmanager.com', port: '', pathname: '/**' },
       { protocol: 'https', hostname: 'www.clarity.ms', port: '', pathname: '/**' },
-      { protocol: "https", hostname: "chart.googleapis.com", port: "", pathname: "/**" }
+      { protocol: "https", hostname: "chart.googleapis.com", port: "", pathname: "/**" },
+      { protocol: "https", hostname: "**.walletconnect.org", port: "", pathname: "/**" },
+      { protocol: "https", hostname: "**.walletconnect.com", port: "", pathname: "/**" },
+      { protocol: "https", hostname: "tokens.1inch.io", port: "", pathname: "/**" },
+      { protocol: "https", hostname: "raw.githubusercontent.com", port: "", pathname: "/**" },
+      { protocol: "https", hostname: "assets.coingecko.com", port: "", pathname: "/**" },
+      { protocol: "https", hostname: "api.sim.dune.com", port: "", pathname: "/**" }
     ]
   },
   webpack(config, options) {
@@ -70,7 +76,9 @@ const nextConfig: NextConfig = {
                 https://www.youtube.com
                 https://www.gstatic.com
                 https://auth.privy.io
-                https://*.privy.io;
+                https://*.privy.io
+                https://*.walletconnect.org
+                https://*.walletconnect.com;
               connect-src 'self'
                 http://localhost:3001
                 https://www.google-analytics.com
@@ -83,10 +91,24 @@ const nextConfig: NextConfig = {
                 https://api.simplesvg.com
                 https://api.unisvg.com
                 https://auth.privy.io
-                https://*.privy.io;
-              img-src 'self' data: https:;
+                https://*.privy.io
+                https://rpc.walletconnect.org
+                https://*.walletconnect.org
+                https://*.walletconnect.com
+                https://relay.walletconnect.org
+                https://relay.walletconnect.com
+                https://api.sim.dune.com
+                https://cloudflare-eth.com
+                https://*.infura.io
+                https://*.alchemy.com
+                https://*.publicnode.com
+                wss://*.walletconnect.org
+                wss://*.walletconnect.com
+                wss://relay.walletconnect.org
+                wss://relay.walletconnect.com;
+              img-src 'self' data: blob: https:;
               style-src 'self' 'unsafe-inline';
-              frame-src 'self' https://www.google.com https://www.youtube.com https://auth.privy.io https://*.privy.io;
+              frame-src 'self' https://www.google.com https://www.youtube.com https://auth.privy.io https://*.privy.io https://verify.walletconnect.org https://verify.walletconnect.com;
               frame-ancestors 'self';
             `.replace(/\s+/g, ' ').trim()
           },
