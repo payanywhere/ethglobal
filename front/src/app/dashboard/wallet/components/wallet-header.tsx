@@ -1,0 +1,66 @@
+import { ArrowDownToLine, ArrowUpRight, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+
+interface WalletHeaderProps {
+  totalValueUSD: number
+  loading?: boolean
+  onSend?: () => void
+  onReceive?: () => void
+}
+
+export function WalletHeader({ totalValueUSD, loading, onSend, onReceive }: WalletHeaderProps) {
+  return (
+    <Card>
+      <CardContent>
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h2 className="text-sm font-heading text-foreground/50">Total Balance</h2>
+            {loading ? (
+              <div className="h-10 w-32 bg-foreground/10 animate-pulse rounded" />
+            ) : (
+              <p className="text-3xl font-heading font-bold">
+                ${totalValueUSD.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            )}
+          </div>  
+          <div className="flex items-center gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onSend}
+              disabled={loading}
+              className="gap-2"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <ArrowUpRight className="h-4 w-4" />
+                  <span>Send</span>
+                </>
+              )}
+            </Button>
+            <Button
+              variant="neutral"
+              size="sm"
+              onClick={onReceive}
+              disabled={loading}
+              className="gap-2"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <ArrowDownToLine className="h-4 w-4" />
+                  <span>Receive</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
