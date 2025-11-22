@@ -4,9 +4,34 @@ out = "out"
 libs = ["lib"]
 
 remappings = [
+    '@layerzerolabs/oft-evm/=lib/devtools/packages/oft-evm/',
     '@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/',
     '@layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol',
     '@layerzerolabs/lz-evm-messagelib-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/messagelib',
     '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/',
     'solidity-bytes-utils/=lib/solidity-bytes-utils/',
 ]
+
+
+[fmt]
+line_length = 180
+tab_width = 4
+bracket_spacing = true
+int_types = 'long'
+quote_style = 'double'
+number_underscore = 'thousands'
+multiline_func_header = 'params_first_multi'
+style = 'space'
+hex_underscore = 'remove'
+single_line_statement_blocks = 'preserve'
+override_spacing = false
+wrap_comments = false
+contract_new_lines = false
+sort_imports = false
+pow_no_space = false
+prefer_compact = 'all'
+docs_style = 'preserve'
+single_line_imports = false
+
+[fuzz]
+runs = 1024
