@@ -2,8 +2,8 @@
 export const dynamic = "force-dynamic"
 
 import { motion } from "framer-motion"
-import { CheckCircle2, Coins, CreditCard, Download, Sparkles } from "lucide-react"
 import { jsPDF } from "jspdf"
+import { CheckCircle2, Coins, CreditCard, Download, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
@@ -24,9 +24,9 @@ function ConfirmedContent() {
     try {
       const doc = new jsPDF()
       const pageWidth = doc.internal.pageSize.getWidth()
-      const pageHeight = doc.internal.pageSize.getHeight()
-      const margin = 20
-      
+      const _pageHeight = doc.internal.pageSize.getHeight()
+      const _margin = 20
+
       // Colors matching neobrutalism theme
       const textColor = 0 // black
       const lightGrayR = 128
@@ -74,13 +74,13 @@ function ConfirmedContent() {
       doc.rect(startX, tableTopY, contentWidth, tableHeight)
 
       // Draw vertical separator line between columns
-      const columnSeparatorX = startX + labelWidth + (cellPadding * 2)
+      const columnSeparatorX = startX + labelWidth + cellPadding * 2
       doc.line(columnSeparatorX, tableTopY, columnSeparatorX, tableTopY + tableHeight)
 
       // Draw rows and content
       tableData.forEach(({ label, value }, index) => {
-        const currentRowY = tableTopY + (index * rowHeight)
-        const textBaseY = currentRowY + (rowHeight / 2) + 3
+        const currentRowY = tableTopY + index * rowHeight
+        const textBaseY = currentRowY + rowHeight / 2 + 3
 
         // Draw horizontal separator line between rows (except for first row)
         if (index > 0) {
@@ -98,7 +98,7 @@ function ConfirmedContent() {
         doc.setFontSize(10)
         doc.setTextColor(textColor, textColor, textColor)
         const valueStartX = columnSeparatorX + cellPadding
-        const valueMaxWidth = contentWidth - labelWidth - (cellPadding * 4)
+        const valueMaxWidth = contentWidth - labelWidth - cellPadding * 4
         doc.text(value, valueStartX, textBaseY, { align: "left", maxWidth: valueMaxWidth })
       })
 
