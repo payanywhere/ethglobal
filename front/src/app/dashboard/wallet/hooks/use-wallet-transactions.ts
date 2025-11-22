@@ -64,13 +64,23 @@ function isLikelySpamTransaction(item: ActivityItem): boolean {
       return true
     }
 
+    // Allow DeFi tokens (aTokens, cTokens, etc.) even without logo
+    const isDeFiToken =
+      symbol.toLowerCase().startsWith("a") ||
+      symbol.toLowerCase().startsWith("c") ||
+      symbol.toLowerCase().includes("lp") ||
+      name.toLowerCase().includes("aave") ||
+      name.toLowerCase().includes("compound") ||
+      name.toLowerCase().includes("uniswap")
+
     // Filter tokens without BOTH decimals AND logo (likely fake)
-    // Real tokens usually have at least one of these
+    // But allow DeFi tokens
     if (
       item.asset_type === "erc20" &&
       !item.token_metadata.decimals &&
       !item.token_metadata.logo &&
-      !item.value_usd
+      !item.value_usd &&
+      !isDeFiToken
     ) {
       return true
     }
@@ -89,7 +99,7 @@ function activityToTransaction(item: ActivityItem, walletAddress: string): Trans
   }
 
   // Filter out transactions with no value at all
-  const hasValue = item.value && BigInt(item.value) > 0n
+  const hasValue = item.value && BigInt(item.value) > 0
   const hasUsdValue = item.value_usd && item.value_usd > 0
 
   // Skip if neither value nor USD value exists
