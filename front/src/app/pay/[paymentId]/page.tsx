@@ -1,13 +1,13 @@
 "use client"
 
+import { AnimatePresence, motion } from "framer-motion"
+import { Coins, CreditCard, Loader2, Sparkles } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreditCard, Coins, Loader2, Sparkles } from "lucide-react"
 
 export default function DemoCheckoutPage() {
   const router = useRouter()
@@ -131,7 +131,11 @@ export default function DemoCheckoutPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* FIAT Payment Option */}
-            <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <Card className="h-full flex flex-col cursor-pointer hover:shadow-lg transition-shadow">
                 <CardHeader className="flex-1">
                   <motion.div
@@ -176,7 +180,11 @@ export default function DemoCheckoutPage() {
             </motion.div>
 
             {/* Crypto Payment Option */}
-            <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <Card className="h-full flex flex-col cursor-pointer hover:shadow-lg transition-shadow">
                 <CardHeader className="flex-1">
                   <motion.div
