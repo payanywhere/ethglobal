@@ -182,4 +182,44 @@
   .marquee-section > div::-webkit-scrollbar {
     display: none;
   }
+
+  /* Neobrutalism Scrollbar Styles */
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--secondary-background);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-base);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-shadow);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--main);
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    background: var(--foreground);
+    box-shadow: 2px 2px 0px 0px var(--border);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: var(--secondary-background);
+    border: 2px solid var(--border);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: var(--background) var(--secondary-background);
+  }
 }
