@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { calculateTokenAmount } from "@/services/dune-sim"
+import { getFriendlyErrorMessage } from "@/lib/error-utils"
 import { CryptoPaymentCard } from "./components/crypto-payment-card"
 import { ErrorMessage } from "./components/error-message"
 import { FiatPaymentCard } from "./components/fiat-payment-card"
@@ -81,7 +82,7 @@ export default function PaymentPage() {
       }
     } catch (err) {
       console.error("Error creating fiat payment:", err)
-      setError("Failed to create payment. Please try again.")
+      setError(getFriendlyErrorMessage(err))
       setProcessing(false)
     }
   }, [payment])
@@ -108,7 +109,7 @@ export default function PaymentPage() {
       router.push(`/pay/confirmed?method=crypto&token=${selectedToken.symbol}`)
     } catch (err) {
       console.error("Error processing crypto payment:", err)
-      setError("Failed to process payment. Please try again.")
+      setError(getFriendlyErrorMessage(err))
       setProcessing(false)
     }
   }, [selectedToken, payment, address, router])

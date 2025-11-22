@@ -75,8 +75,10 @@ const nextConfig: NextConfig = {
                 https://www.google.com
                 https://www.youtube.com
                 https://www.gstatic.com
-                https://auth.privy.io
-                https://*.privy.io
+                https://app.dynamic.xyz
+                https://*.dynamic.xyz
+                https://app.dynamicauth.com
+                https://*.dynamicauth.com
                 https://*.walletconnect.org
                 https://*.walletconnect.com;
               connect-src 'self'
@@ -90,8 +92,10 @@ const nextConfig: NextConfig = {
                 https://api.iconify.design
                 https://api.simplesvg.com
                 https://api.unisvg.com
-                https://auth.privy.io
-                https://*.privy.io
+                https://app.dynamic.xyz
+                https://*.dynamic.xyz
+                https://app.dynamicauth.com
+                https://*.dynamicauth.com
                 https://rpc.walletconnect.org
                 https://*.walletconnect.org
                 https://*.walletconnect.com
@@ -102,13 +106,22 @@ const nextConfig: NextConfig = {
                 https://*.infura.io
                 https://*.alchemy.com
                 https://*.publicnode.com
+                https://eth.llamarpc.com
+                https://*.llamarpc.com
+                https://rpc.ankr.com
+                https://*.ankr.com
+                https://eth-mainnet.g.alchemy.com
+                https://polygon-rpc.com
+                https://*.polygon.technology
+                https://bsc-dataseed.binance.org
+                https://*.binance.org
                 wss://*.walletconnect.org
                 wss://*.walletconnect.com
                 wss://relay.walletconnect.org
                 wss://relay.walletconnect.com;
               img-src 'self' data: blob: https:;
               style-src 'self' 'unsafe-inline';
-              frame-src 'self' https://www.google.com https://www.youtube.com https://auth.privy.io https://*.privy.io https://verify.walletconnect.org https://verify.walletconnect.com;
+              frame-src 'self' https://www.google.com https://www.youtube.com https://app.dynamic.xyz https://*.dynamic.xyz https://app.dynamicauth.com https://*.dynamicauth.com https://verify.walletconnect.org https://verify.walletconnect.com;
               frame-ancestors 'self';
             `.replace(/\s+/g, ' ').trim()
           },

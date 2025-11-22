@@ -5,12 +5,13 @@ import { WalletHeader } from "./components/wallet-header"
 import { TokenBalancesList } from "./components/token-balances-list"
 import { TransactionHistory } from "./components/transaction-history"
 import { ReceiveOverlay } from "./components/receive-overlay"
-import { usePrivyWallet } from "./hooks/use-privy-wallet"
+import { SendOverlay } from "./components/send-overlay"
+import { useMerchantWallet } from "./hooks/use-merchant-wallet"
 import { useWalletBalances } from "./hooks/use-wallet-balances"
 import { useWalletTransactions } from "./hooks/use-wallet-transactions"
 
 export default function WalletPage() {
-  const { walletAddress, ready } = usePrivyWallet()
+  const { walletAddress, ready } = useMerchantWallet()
   const [showSendModal, setShowSendModal] = useState(false)
   const [showReceiveModal, setShowReceiveModal] = useState(false)
 
@@ -31,10 +32,13 @@ export default function WalletPage() {
 
   // Handlers
   const handleSend = useCallback(() => {
-    // TODO: Implement send modal
     setShowSendModal(true)
-    console.log("Send clicked")
   }, [])
+
+  const handleSendSuccess = useCallback(() => {
+    // Refresh balances after successful send
+    refetchBalances()
+  }, [refetchBalances])
 
   const handleReceive = useCallback(() => {
     setShowReceiveModal(true)
@@ -110,6 +114,14 @@ export default function WalletPage() {
         open={showReceiveModal}
         onOpenChange={setShowReceiveModal}
         address={walletAddress}
+      />
+
+      {/* Send Overlay */}
+      <SendOverlay
+        open={showSendModal}
+        onOpenChange={setShowSendModal}
+        tokens={balances}
+        onSuccess={handleSendSuccess}
       />
     </div>
   )

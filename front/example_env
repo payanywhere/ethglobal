@@ -5,5 +5,5 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 MP_PUBLIC_KEY=TEST-...
 MP_ACCESS_TOKEN=TEST-....
 
-# Privy Configuration
-NEXT_PUBLIC_PRIVY_APP_ID=your-privy-app-id
+# Dynamic
+NEXT_PUBLIC_DYNAMIC_ENV_ID=your-dynamic-environment-id

@@ -1,6 +1,6 @@
 "use client"
 
-import { usePrivy } from "@privy-io/react-auth"
+import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core"
 import {
   BarChart3,
   CreditCard,
@@ -13,6 +13,7 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { useEffect } from "react"
 import {
   Sidebar,
   SidebarContent,
@@ -59,12 +60,38 @@ const menuItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { logout } = usePrivy()
+  const { handleLogOut, isAuthenticated, isAuthLoading, sdkHasLoaded } = useDynamicContext()
+  const isLoggedIn = useIsLoggedIn()
   const router = useRouter()
 
+  // Protect dashboard routes - redirect to login if not authenticated
+  useEffect(() => {
+    if (sdkHasLoaded && !isAuthLoading && !isAuthenticated && !isLoggedIn) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, isLoggedIn, isAuthLoading, sdkHasLoaded, router])
+
   const handleLogout = async () => {
-    await logout()
+    await handleLogOut()
     router.push("/")
+  }
+
+  // Show loading while checking auth status
+  if (!sdkHasLoaded || isAuthLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    )
+  }
+
+  // Show loading while redirecting unauthenticated users
+  if (!isAuthenticated && !isLoggedIn) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-foreground">Redirecting...</div>
+      </div>
+    )
   }
 
   return (
