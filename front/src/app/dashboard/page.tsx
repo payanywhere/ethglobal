@@ -3,7 +3,16 @@
 import Image from "next/image"
 import QRCode from "qrcode"
 import { useEffect, useState } from "react"
-import NavBar from "../components/NavBar"
+import Link from "next/link"
+import { DollarSign, TrendingUp, CreditCard, Users, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 
 interface PaymentResponse {
   payment_id: string
@@ -54,41 +63,111 @@ export default function DashboardPage() {
     createPayment().catch(console.error)
   }, [])
 
-  return (
-    <main>
-      <NavBar />
-      <div className="p-8 space-y-8">
-        <h1 className="text-3xl font-bold mb-4">Merchant Dashboard (demo)</h1>
+  // Placeholder metrics data
+  const metrics = [
+    {
+      title: "Total Revenue",
+      value: "$12,450",
+      change: "+12.5%",
+      description: "from last month",
+      icon: DollarSign
+    },
+    {
+      title: "Active Payments",
+      value: "234",
+      change: "+8.2%",
+      description: "from last month",
+      icon: CreditCard
+    },
+    {
+      title: "Growth Rate",
+      value: "18.3%",
+      change: "+2.1%",
+      description: "from last month",
+      icon: TrendingUp
+    },
+    {
+      title: "Total Customers",
+      value: "1,429",
+      change: "+15.7%",
+      description: "from last month",
+      icon: Users
+    }
+  ]
 
-        <section>
-          <h2 className="font-semibold mb-2">New Payment</h2>
-          <p className="text-sm text-gray-600 mb-4">
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-heading font-bold">Dashboard</h1>
+          <p className="text-foreground/50 mt-1">
+            Overview of your merchant account and sales performance
+          </p>
+        </div>
+        <Button asChild variant="default" className="gap-2">
+          <Link href="/payment">
+            <Plus className="h-4 w-4" />
+            Create Payment
+          </Link>
+        </Button>
+      </div>
+
+      {/* Metrics Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((metric) => (
+          <Card key={metric.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
+              <metric.icon className="h-4 w-4 text-foreground/50" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{metric.value}</div>
+              <p className="text-xs text-foreground/50 mt-1">
+                <span className="text-green-600 font-medium">{metric.change}</span>{" "}
+                {metric.description}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Payment Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>New Payment</CardTitle>
+          <CardDescription>
             Each time you open this dashboard, a new mock payment is created and linked to the demo
             checkout page.
-          </p>
-
-          {loading && <p className="text-gray-500">Generating payment...</p>}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading && <p className="text-foreground/50">Generating payment...</p>}
           {error && <p className="text-red-500">{error}</p>}
 
           {!loading && qrData && (
-            <div className="flex flex-col sm:flex-row items-center space-y-6 sm:space-y-0 sm:space-x-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
               <Image
                 alt="payment-qr"
                 src={qrData}
                 width={240}
                 height={240}
-                className="border rounded"
+                className="border-2 border-border rounded-base"
               />
-              <div>
-                <p className="font-medium text-gray-700 mb-2">Payment link:</p>
-                <a href={paymentLink} className="text-blue-600 underline break-all">
+              <div className="flex-1">
+                <p className="font-medium mb-2">Payment link:</p>
+                <a
+                  href={paymentLink}
+                  className="text-blue-600 hover:underline break-all"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {paymentLink}
                 </a>
               </div>
             </div>
           )}
-        </section>
-      </div>
-    </main>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

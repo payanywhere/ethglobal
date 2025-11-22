@@ -38,6 +38,17 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const id = url.searchParams.get("payment_id") ?? ""
+  const merchantId = url.searchParams.get("merchant_id") ?? ""
+
+  // If merchant_id is provided, return all payments for that merchant
+  if (merchantId) {
+    const merchantPayments = Array.from(payments.values()).filter(
+      (p) => p.merchant_id === merchantId
+    )
+    // Sort by payment_id (most recent first, assuming newer IDs come later)
+    merchantPayments.sort((a, b) => b.payment_id.localeCompare(a.payment_id))
+    return NextResponse.json(merchantPayments)
+  }
 
   if (id.startsWith("merchant-")) {
     const merchantId = id.replace("merchant-", "")
