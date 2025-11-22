@@ -21,4 +21,5 @@ export class ConsolidatorContract {
     const value = (await fn()) as bigint
     return Number(value)
   }
+
 }

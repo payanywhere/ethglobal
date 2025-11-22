@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
 import {
-  getMerchantByAddressUseCase,
   getMerchantByEmailUseCase,
+  getMerchantByAddressUseCase,
   registerMerchantUseCase
 } from "../../../factories/use-case-factory"
 
@@ -45,6 +45,7 @@ export async function getMerchantByEmail(
     res.status(500).json({ error: message })
   }
 }
+
 
 export async function getMerchantByAddress(
   req: Request,

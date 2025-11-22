@@ -2,6 +2,7 @@ import { ConsolidatePaymentsUseCase } from "../application/use-cases/consolidate
 import { CreatePaymentUseCase } from "../application/use-cases/create-payment-use-case"
 import { GetMerchantByAddressUseCase } from "../application/use-cases/get-merchant-by-address-use-case"
 import { GetMerchantByEmailUseCase } from "../application/use-cases/get-merchant-by-email-use-case"
+import { GetMerchantByAddressUseCase } from "../application/use-cases/get-merchant-by-address-use-case"
 import { GetMerchantsUseCase } from "../application/use-cases/get-merchants-use-case"
 import { GetPaymentsByMerchantUseCase } from "../application/use-cases/get-payments-by-merchant-use-case"
 import { RegisterMerchant } from "../application/use-cases/register-merchant"
