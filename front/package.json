@@ -13,6 +13,7 @@
     "docker:run": "bash ./scripts/docker-run.sh"
   },
   "dependencies": {
+    "@coinbase/cdp-sdk": "^1.38.6",
     "@dynamic-labs/ethereum": "^4.47.0",
     "@dynamic-labs/sdk-react-core": "^4.47.0",
     "@gemini-wallet/core": "^0.3.2",
