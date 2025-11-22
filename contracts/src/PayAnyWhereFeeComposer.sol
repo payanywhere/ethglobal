@@ -20,6 +20,7 @@ contract PayAnyWhereFeeComposer is ILayerZeroComposer {
     error OnlySelf(address caller);
 
     event PaymentReceived(address indexed recipient, uint256 amountLd);
+    event Sent(bytes32 indexed guid);
 
     using SafeERC20 for IERC20;
 
@@ -62,6 +63,7 @@ contract PayAnyWhereFeeComposer is ILayerZeroComposer {
 
         // Try to decompose the message, refund if it fails.
         this.handleCompose{ value: msg.value }(_message, amountLD);
+        emit Sent(_guid);
     }
 
     function handleCompose(bytes calldata _message, uint256 _amountLD) external payable {
