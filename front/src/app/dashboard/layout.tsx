@@ -109,17 +109,17 @@ export default function DashboardLayout({
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="relative pb-12">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-                <LogOut />
-                <span>Logout</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-          <div className="absolute bottom-2 right-2">
-            <SidebarTrigger className="h-8 w-8 border-0 bg-transparent shadow-none hover:bg-main hover:text-main-foreground" />
+        <SidebarFooter>
+          <div className="flex items-center justify-between gap-2 px-2">
+            <SidebarMenu className="flex-1">
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                  <LogOut />
+                  <span>Logout</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+            <SidebarTrigger className="h-7 w-7 border-0 bg-transparent shadow-none hover:bg-main hover:text-main-foreground p-0 flex-shrink-0" />
           </div>
         </SidebarFooter>
       </Sidebar>

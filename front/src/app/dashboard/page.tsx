@@ -105,7 +105,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <Button asChild variant="default" className="gap-2">
-          <Link href="/payment">
+          <Link href="/dashboard/payments?create=true">
             <Plus className="h-4 w-4" />
             Create Payment
           </Link>
