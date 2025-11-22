@@ -7,6 +7,9 @@
   },
   "files": {
     "ignoreUnknown": true,
+    "ignore": [
+      "**/*.css"
+    ],
     "includes": [
       "**",
       "!node_modules",
@@ -51,6 +54,9 @@
   "css": {
     "parser": {
       "tailwindDirectives": true
+    },
+    "linter": {
+      "enabled": false
     }
   }
 }
