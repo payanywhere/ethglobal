@@ -1,17 +1,18 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
 import { usePrivy } from "@privy-io/react-auth"
 import {
-  LayoutDashboard,
-  CreditCard,
   BarChart3,
-  Settings,
-  Wallet,
+  CreditCard,
+  LayoutDashboard,
   LogOut,
-  Menu
+  Menu,
+  Settings,
+  Wallet
 } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +28,6 @@ import {
   SidebarRail,
   SidebarTrigger
 } from "@/components/ui/sidebar"
-import Image from "next/image"
 
 const menuItems = [
   {
@@ -57,11 +57,7 @@ const menuItems = [
   }
 ]
 
-export default function DashboardLayout({
-  children
-}: {
-  children: React.ReactNode
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { logout } = usePrivy()
   const router = useRouter()
@@ -86,7 +82,9 @@ export default function DashboardLayout({
               />
               <div className="flex flex-col justify-center gap-[2px] min-w-0 h-9">
                 <span className="font-heading text-base md:text-md leading-tight">PayAnyWhere</span>
-                <span className="text-xs md:text-[12px] text-foreground/50 leading-tight">Merchant Portal</span>
+                <span className="text-xs md:text-[12px] text-foreground/50 leading-tight">
+                  Merchant Portal
+                </span>
               </div>
             </div>
             <SidebarTrigger className="h-7 w-7 md:h-7 md:w-7 md:ml-3 border-0 bg-transparent shadow-none hover:bg-main hover:text-main-foreground p-0 shrink-0" />
@@ -143,11 +141,8 @@ export default function DashboardLayout({
             <Menu className="h-5 w-5" />
           </SidebarTrigger>
         </header>
-        <div className="flex flex-1 flex-col gap-6 p-6">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-6 p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )
 }
-
