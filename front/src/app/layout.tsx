@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 import { ThemeProvider } from "next-themes"
-import { PrivyAuthProvider } from "@/components/privy-provider"
+import { DynamicProvider } from "@/components/dynamic-provider"
 import "./globals.css"
 
 /* Satoshi Font */
@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${SATOSHI.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <PrivyAuthProvider>{children}</PrivyAuthProvider>
+          <DynamicProvider>{children}</DynamicProvider>
         </ThemeProvider>
       </body>
     </html>
