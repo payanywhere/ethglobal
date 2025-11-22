@@ -1,2 +1,4 @@
 PORT=3000
 MONGO_URI=mongodb+srv://xxx:xxx@pyw.nq9sz8c.mongodb.net/
+RPC_PROVIDER=https://polygon-amoy.g.alchemy.com/v2/YOUR_KEY
+PRIVATE_KEY=SOME_KEY

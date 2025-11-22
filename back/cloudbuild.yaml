@@ -14,6 +14,8 @@ steps:
     env:
       - APP_ENV=${_APP_ENV}
       - MONGO_URI=${_MONGO_URI}
+      - RPC_PROVIDER=${_RPC_PROVIDER}
+      - PRIVATE_KEY=${_PRIVATE_KEY}
     args:
       - -c
       - |
@@ -21,6 +23,8 @@ steps:
         echo "APP_ENV=${_APP_ENV}" > .env
         echo "NODE_ENV=production" >> .env
         echo "MONGO_URI=${_MONGO_URI}" >> .env
+        echo "RPC_PROVIDER=${_RPC_PROVIDER}" >> .env
+        echo "PRIVATE_KEY=${_PRIVATE_KEY}" >> .env
         echo ".env generated in /back:"
         cat .env
 
@@ -37,6 +41,8 @@ steps:
       '--build-arg', 'APP_ENV=${_APP_ENV}',
       '--build-arg', 'NODE_ENV=production',
       '--build-arg', 'MONGO_URI=${_MONGO_URI}',
+      '--build-arg', 'RPC_PROVIDER=${_RPC_PROVIDER}', 
+      '--build-arg', 'PRIVATE_KEY=${_PRIVATE_KEY}',
       '.'
     ]
 
@@ -75,7 +81,9 @@ steps:
           --set-env-vars '
             APP_ENV=${_APP_ENV},
             NODE_ENV=production,
-            MONGO_URI=${_MONGO_URI}
+            MONGO_URI=${_MONGO_URI},
+            RPC_PROVIDER=${_RPC_PROVIDER},
+            PRIVATE_KEY=${_PRIVATE_KEY}
           ' \
           --project=${_PROJECT_ID}
 
