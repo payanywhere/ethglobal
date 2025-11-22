@@ -146,6 +146,7 @@ export function formatActivityValue(item: ActivityItem): string {
 
 /**
  * Get chain name from chain ID
+ * @deprecated Use getChainName from @/constants/chains instead
  */
 export function getChainName(chainId: number): string {
   const chains: Record<number, string> = {
