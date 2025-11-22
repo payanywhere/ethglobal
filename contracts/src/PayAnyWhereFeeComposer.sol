@@ -54,6 +54,8 @@ contract PayAnyWhereFeeComposer is ILayerZeroComposer {
         ENDPOINT = address(IStargateEndpoint(_oftIn).endpoint());
         PAYANYWHERE = payAnyWhere;
         feeBps = _feeBps;
+
+        IERC20(TOKEN_IN).approve(address(AAVE), type(uint256).max);
     }
 
     function lzCompose(address _sender, bytes32 _guid, bytes calldata _message, address, bytes calldata) external payable {
