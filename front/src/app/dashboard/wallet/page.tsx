@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function WalletPage() {
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-1">
         <h1 className="text-3xl font-heading font-bold">Wallet</h1>
-        <p className="text-foreground/50 mt-1">
+        <p className="text-foreground/50 text-sm">
           Manage your crypto wallet and transactions
         </p>
       </div>

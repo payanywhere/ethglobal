@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-1">
         <h1 className="text-3xl font-heading font-bold">Settings</h1>
-        <p className="text-foreground/50 mt-1">
+        <p className="text-foreground/50 text-sm">
           Manage your account settings and preferences
         </p>
       </div>

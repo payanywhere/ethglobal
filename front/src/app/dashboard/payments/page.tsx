@@ -177,23 +177,23 @@ export default function PaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
           <h1 className="text-3xl font-heading font-bold">Payments</h1>
-          <p className="text-foreground/50 mt-1">
+          <p className="text-foreground/50 text-sm">
             Manage and track all your payment transactions
           </p>
         </div>
-        <Button onClick={handleCreateClick} variant="default" className="gap-2">
+        <Button onClick={handleCreateClick} variant="default" className="gap-2 shrink-0">
           <Plus className="h-4 w-4" />
           Create Payment
         </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
           </CardHeader>
           <CardContent>
@@ -201,7 +201,7 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
           </CardHeader>
           <CardContent>
@@ -209,7 +209,7 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
           </CardHeader>
           <CardContent>
@@ -217,7 +217,7 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
