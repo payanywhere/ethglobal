@@ -81,8 +81,8 @@ export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBa
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
+      <CardContent className="pb-4">
+        <div className="space-y-3 max-h-[600px] overflow-y-auto">
           {tokens.map((token) => (
             <TokenBalanceItem key={`${token.chain_id}-${token.address}`} token={token} />
           ))}
