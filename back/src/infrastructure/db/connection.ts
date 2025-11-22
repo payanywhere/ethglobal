@@ -12,9 +12,9 @@ export async function connectDB(): Promise<void> {
   try {
     console.log("🔌 Attempting MongoDB connection...")
     await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000,
-      socketTimeoutMS: 5000
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 10000
     })
     console.log("✅ MongoDB connected successfully")
   } catch (err) {
