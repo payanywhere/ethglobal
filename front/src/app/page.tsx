@@ -1,8 +1,11 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import NavBar from "./components/NavBar"
 import Image from "next/image"
 import Marquee from "@/components/ui/marquee"
 import { ArrowRightIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useCallback } from "react"
 
 const paymentBenefits = [
   "Global Payments",
@@ -17,10 +20,19 @@ const paymentBenefits = [
 ]
 
 export default function Home() {
+  /** Navigation setup */
+  const router = useRouter();
+  
+  /** Login redirect */
+  const handleButtonClick = useCallback((e: React.MouseEvent<HTMLButtonElement>)=>{
+    e.preventDefault();
+    router.push("/login");
+  }, [router]);
+
   return (
     <main className="overflow-x-hidden">
       <NavBar />
-      <section className="w-full min-h-[50vh] flex flex-col md:flex-row items-center h-[calc(100vh-250px)] relative top-10">
+      <section className="w-full min-h-[50vh] flex flex-col md:flex-row items-center h-[calc(100vh-250px)]">
         <div className="flex-1 flex flex-col justify-center px-8 md:px-12">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
             Accept crypto anywhere in the world
@@ -28,7 +40,7 @@ export default function Home() {
           <p className="text-lg md:text-xl text-gray-600">
             Any token, any fiat currency, in one place.
           </p>
-          <Button variant={"default"} className="mt-6 w-fit min-w-60 min-h-12 text-lg font-bold">
+          <Button variant={"default"} className="mt-6 w-fit min-w-60 min-h-12 text-lg font-bold" onClick={handleButtonClick}>
             Get Started
             <ArrowRightIcon className="min-w-5 min-h-5" />
           </Button>
