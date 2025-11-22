@@ -1,18 +1,12 @@
 "use client"
 
+import { CreditCard, DollarSign, Plus, TrendingUp, Users } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import QRCode from "qrcode"
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { DollarSign, TrendingUp, CreditCard, Users, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface PaymentResponse {
   payment_id: string

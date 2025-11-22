@@ -7,9 +7,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div className="space-y-1">
         <h1 className="text-3xl font-heading font-bold">Settings</h1>
-        <p className="text-foreground/50 text-sm">
-          Manage your account settings and preferences
-        </p>
+        <p className="text-foreground/50 text-sm">Manage your account settings and preferences</p>
       </div>
 
       <Card>
@@ -24,4 +22,3 @@ export default function SettingsPage() {
     </div>
   )
 }
-
