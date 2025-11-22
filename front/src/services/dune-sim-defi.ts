@@ -162,20 +162,35 @@ export function getChainName(chainId: number): string {
 
 /**
  * Get the underlying token symbol from Aave token symbol
- * e.g., "aBnbUSDT" -> "USDT", "aWETH" -> "WETH"
+ * e.g., "aBnbUSDT" -> "USDT", "aWETH" -> "WETH", "aPolUSDCn" -> "USDC"
  */
 export function getUnderlyingSymbolFromAaveToken(aaveSymbol: string): string | null {
   const symbol = aaveSymbol.toLowerCase()
   
   // Remove common Aave prefixes
   if (symbol.startsWith("abnb")) {
-    return symbol.substring(4).toUpperCase() // "aBnbUSDT" -> "USDT"
+    let underlying = symbol.substring(4) // "aBnbUSDT" -> "usdt"
+    // Remove trailing "n" if present (native token indicator)
+    if (underlying.endsWith("n")) {
+      underlying = underlying.slice(0, -1)
+    }
+    return underlying.toUpperCase() // "USDT"
   }
   if (symbol.startsWith("apol")) {
-    return symbol.substring(4).toUpperCase() // "aPolUSDC" -> "USDC"
+    let underlying = symbol.substring(4) // "aPolUSDCn" -> "usdcn"
+    // Remove trailing "n" if present (native token indicator on Polygon)
+    if (underlying.endsWith("n")) {
+      underlying = underlying.slice(0, -1)
+    }
+    return underlying.toUpperCase() // "USDC"
   }
   if (symbol.startsWith("a")) {
-    return symbol.substring(1).toUpperCase() // "aWETH" -> "WETH", "aUSDT" -> "USDT"
+    let underlying = symbol.substring(1) // "aWETH" -> "weth", "aUSDT" -> "usdt"
+    // Remove trailing "n" if present (native token indicator)
+    if (underlying.endsWith("n")) {
+      underlying = underlying.slice(0, -1)
+    }
+    return underlying.toUpperCase() // "WETH", "USDT"
   }
   
   return null

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { fetchWalletBalances, type TokenBalance } from "@/services/dune-sim"
 import {
   fetchDefiPositions,
@@ -55,8 +55,19 @@ export function useWalletBalances(address: string | null) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [totalValueUSD, setTotalValueUSD] = useState<number>(0)
+  const isLoadingRef = useRef(false)
+  const lastAddressRef = useRef<string | null>(null)
 
-  const loadBalances = useCallback(async () => {
+  const loadBalances = useCallback(async (force = false) => {
+    // Prevent duplicate calls (unless forced)
+    if (isLoadingRef.current && !force) {
+      return
+    }
+
+    // Skip if address hasn't changed (unless forced)
+    if (!force && address === lastAddressRef.current && lastAddressRef.current !== null) {
+      return
+    }
     if (!address) {
       setBalances([])
       setTotalValueUSD(0)
@@ -64,6 +75,8 @@ export function useWalletBalances(address: string | null) {
     }
 
     try {
+      isLoadingRef.current = true
+      lastAddressRef.current = address
       setLoading(true)
       setError(null)
 
@@ -212,7 +225,15 @@ export function useWalletBalances(address: string | null) {
 
       // Combine enriched balances and DeFi positions (no more separate Aave array)
       const allBalances = [...enrichedBalances, ...defiBalances]
-      setBalances(allBalances)
+      
+      // Sort by USD value (descending - highest first)
+      const sortedBalances = allBalances.sort((a, b) => {
+        const valueA = a.value_usd || 0
+        const valueB = b.value_usd || 0
+        return valueB - valueA
+      })
+      
+      setBalances(sortedBalances)
 
       // Calculate total USD value
       // For enriched tokens (includes regular + Aave from non-DeFi chains): sum their value_usd
@@ -237,11 +258,19 @@ export function useWalletBalances(address: string | null) {
       setError(err instanceof Error ? err.message : "Failed to load wallet balances")
     } finally {
       setLoading(false)
+      isLoadingRef.current = false
     }
   }, [address])
 
   useEffect(() => {
-    loadBalances()
+    // Only load if address changed
+    if (address !== lastAddressRef.current) {
+      loadBalances()
+    }
+  }, [address, loadBalances])
+
+  const refetch = useCallback(() => {
+    loadBalances(true)
   }, [loadBalances])
 
   return {
@@ -249,7 +278,7 @@ export function useWalletBalances(address: string | null) {
     loading,
     error,
     totalValueUSD,
-    refetch: loadBalances
+    refetch
   }
 }
 
