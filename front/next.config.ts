@@ -68,7 +68,9 @@ const nextConfig: NextConfig = {
                 https://*.clarity.ms
                 https://www.google.com
                 https://www.youtube.com
-                https://www.gstatic.com;
+                https://www.gstatic.com
+                https://auth.privy.io
+                https://*.privy.io;
               connect-src 'self'
                 http://localhost:3001
                 https://www.google-analytics.com
@@ -79,10 +81,12 @@ const nextConfig: NextConfig = {
                 https://www.gstatic.com
                 https://api.iconify.design
                 https://api.simplesvg.com
-                https://api.unisvg.com;
+                https://api.unisvg.com
+                https://auth.privy.io
+                https://*.privy.io;
               img-src 'self' data: https:;
               style-src 'self' 'unsafe-inline';
-              frame-src 'self' https://www.google.com https://www.youtube.com;
+              frame-src 'self' https://www.google.com https://www.youtube.com https://auth.privy.io https://*.privy.io;
               frame-ancestors 'self';
             `.replace(/\s+/g, ' ').trim()
           },
