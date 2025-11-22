@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-1">
         <h1 className="text-3xl font-heading font-bold">Analytics</h1>
-        <p className="text-foreground/50 mt-1">
+        <p className="text-foreground/50 text-sm">
           View detailed analytics and insights for your business
         </p>
       </div>

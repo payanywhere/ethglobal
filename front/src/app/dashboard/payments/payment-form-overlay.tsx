@@ -261,7 +261,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
                   setQrImage("")
                 }}
                 variant="neutral"
-                className="flex-1 min-h-12 text-lg font-heading"
+                className="flex-1 h-12 text-lg !font-heading !font-bold"
                 size="lg"
               >
                 Create Another
@@ -269,7 +269,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
               <Button
                 onClick={handleSuccess}
                 variant="default"
-                className="flex-1 min-h-12 text-lg font-heading"
+                className="flex-1 h-12 text-lg !font-heading !font-bold"
                 size="lg"
               >
                 Done
@@ -281,7 +281,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
                 onClick={handleClose}
                 variant="neutral"
                 disabled={loading}
-                className="flex-1 min-h-12 text-lg font-heading"
+                className="flex-1 h-12 text-lg !font-heading !font-bold"
                 size="lg"
               >
                 Cancel
@@ -289,7 +289,8 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
               <Button
                 onClick={createPayment}
                 disabled={loading || amount <= 0}
-                className="flex-1 min-h-12 text-lg font-heading"
+                variant="default"
+                className="flex-1 h-12 text-lg !font-heading !font-bold"
                 size="lg"
               >
                 {loading ? (

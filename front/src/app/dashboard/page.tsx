@@ -97,14 +97,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
           <h1 className="text-3xl font-heading font-bold">Dashboard</h1>
-          <p className="text-foreground/50 mt-1">
+          <p className="text-foreground/50 text-sm">
             Overview of your merchant account and sales performance
           </p>
         </div>
-        <Button asChild variant="default" className="gap-2">
+        <Button asChild variant="default" className="gap-2 shrink-0">
           <Link href="/dashboard/payments?create=true">
             <Plus className="h-4 w-4" />
             Create Payment
@@ -113,16 +113,16 @@ export default function DashboardPage() {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => (
           <Card key={metric.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
               <metric.icon className="h-4 w-4 text-foreground/50" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-1">
               <div className="text-2xl font-bold">{metric.value}</div>
-              <p className="text-xs text-foreground/50 mt-1">
+              <p className="text-xs text-foreground/50">
                 <span className="text-green-600 font-medium">{metric.change}</span>{" "}
                 {metric.description}
               </p>
