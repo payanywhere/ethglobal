@@ -3,21 +3,183 @@ export const dynamic = "force-dynamic"
 
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import NavBar from "../../components/NavBar"
+import { motion } from "framer-motion"
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle2, Sparkles, Coins, CreditCard, Download } from "lucide-react"
 
 function ConfirmedContent() {
   const params = useSearchParams()
-  const method = params.get("method")
+  const method = params.get("method") || "unknown"
+
+  const isCrypto = method.toLowerCase() === "crypto"
+  const MethodIcon = isCrypto ? Coins : CreditCard
+
+  const handleSaveReceipt = () => {
+    // Generate and download receipt
+    const receiptData = {
+      method: method.toUpperCase(),
+      date: new Date().toLocaleString(),
+      status: "Completed"
+    }
+    const blob = new Blob([JSON.stringify(receiptData, null, 2)], { type: "application/json" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `payment-receipt-${Date.now()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   return (
-    <main>
-      <NavBar />
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-3">Payment Confirmed (mock)</h1>
-        <p className="text-gray-700">
-          You have successfully paid using{" "}
-          <span className="font-semibold">{method?.toUpperCase()}</span>.
-        </p>
+    <main className="min-h-screen">
+      {/* Centered logo for user-facing page */}
+      <nav className="flex items-center justify-center p-6 mb-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-heading text-foreground hover:opacity-80 transition-opacity"
+        >
+          <Image
+            src="/logo.svg"
+            alt="PayAnyWhere Logo"
+            width={24}
+            height={24}
+            className="w-6 h-6"
+          />
+          <span>PayAnyWhere</span>
+        </Link>
+      </nav>
+
+      <div className="container max-w-2xl mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-6"
+        >
+          {/* Main Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="text-center">
+              <CardHeader className="space-y-4">
+                <motion.div
+                  className="flex justify-center"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+                >
+                            <motion.div
+            className="flex justify-center"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          >
+            <motion.div
+              className="w-24 h-24 rounded-full border-4 border-border bg-chart-1 flex items-center justify-center shadow-shadow"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <CheckCircle2 className="w-12 h-12 text-main-foreground" />
+            </motion.div>
+          </motion.div>
+                </motion.div>
+                <CardTitle className="text-3xl md:text-4xl font-heading">
+                  Payment Successful!
+                </CardTitle>
+                <CardDescription className="text-base font-base">
+                  Your payment via <span className="font-heading font-bold text-foreground">{method.toUpperCase()}</span> has been processed successfully.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Unified Information Box */}
+                <motion.div
+                  className="p-6 rounded-base border-2 border-border bg-secondary-background space-y-3 shadow-shadow text-left"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-foreground" />
+                    <p className="text-sm font-heading font-bold text-foreground">
+                      Transaction Details
+                    </p>
+                  </div>
+                  <div className="space-y-2 text-sm font-base">
+                    <div className="flex justify-between">
+                      <span className="text-foreground/70">Method:</span>
+                      <span className="font-heading font-bold">{method.toUpperCase()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-foreground/70">Status:</span>
+                      <span className="font-heading font-bold text-chart-1">Completed</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-foreground/70">Date:</span>
+                      <span className="font-base">{new Date().toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs font-base text-foreground/60 pt-2 border-t-2 border-border">
+                    You will receive a confirmation email shortly with all the details.
+                  </p>
+                </motion.div>
+
+                {/* Main Action - Save Receipt */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <motion.div whileHover={{ x: 4, y: 4 }} whileTap={{ x: 0, y: 0 }}>
+                    <Button
+                      onClick={handleSaveReceipt}
+                      variant="default"
+                      size="lg"
+                      className="w-full min-h-14 text-lg font-heading"
+                    >
+                      <Download className="w-5 h-5" />
+                      Save Receipt
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+      </div>
+    </main>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <main className="min-h-screen">
+      <nav className="flex items-center justify-center p-6 mb-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-heading text-foreground"
+        >
+          <Image
+            src="/logo.svg"
+            alt="PayAnyWhere Logo"
+            width={24}
+            height={24}
+            className="w-6 h-6"
+          />
+          <span>PayAnyWhere</span>
+        </Link>
+      </nav>
+      <div className="container max-w-2xl mx-auto px-4 py-12">
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="w-12 h-12 rounded-base border-2 border-border border-t-transparent animate-spin" />
+          <p className="mt-4 font-heading text-foreground/50">Loading confirmation…</p>
+        </div>
       </div>
     </main>
   )
@@ -25,7 +187,7 @@ function ConfirmedContent() {
 
 export default function ConfirmedPage() {
   return (
-    <Suspense fallback={<div className="p-8">Loading confirmation…</div>}>
+    <Suspense fallback={<LoadingFallback />}>
       <ConfirmedContent />
     </Suspense>
   )
