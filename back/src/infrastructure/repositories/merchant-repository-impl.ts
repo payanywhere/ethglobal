@@ -15,7 +15,7 @@ export class MerchantRepositoryImpl implements MerchantRepository {
   async findByAddress(address: string): Promise<Merchant | null> {
     return await MerchantModel.findOne({ "wallets.address": address }).lean()
   }
-  
+
   async getAll(): Promise<Merchant[]> {
     return await MerchantModel.find().lean()
   }

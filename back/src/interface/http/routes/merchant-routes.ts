@@ -1,5 +1,9 @@
 import { Router } from "express"
-import { getMerchantByAddress, getMerchantByEmail, registerMerchant } from "../controllers/merchant-controller"
+import {
+  getMerchantByAddress,
+  getMerchantByEmail,
+  registerMerchant
+} from "../controllers/merchant-controller"
 
 const router = Router()
 router.post("/merchants/register", registerMerchant)
