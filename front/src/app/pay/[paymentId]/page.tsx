@@ -147,7 +147,7 @@ export default function PaymentPage() {
           <PaymentAmount
             amount={payment.amount_usd}
             paymentId={payment.payment_id}
-            variants={itemVariants}
+              variants={itemVariants}
           />
 
           <ErrorMessage error={displayError} />
