@@ -5,6 +5,7 @@ import {
   filterTokensWithSufficientBalance,
   type TokenBalance
 } from "@/services/dune-sim"
+import { getFriendlyErrorMessage } from "@/lib/error-utils"
 import type { PaymentDetails } from "../types"
 
 export function useTokenBalances(payment: PaymentDetails | null) {
@@ -46,7 +47,7 @@ export function useTokenBalances(payment: PaymentDetails | null) {
       }
     } catch (err) {
       console.error("Error loading balances:", err)
-      setError(err instanceof Error ? err.message : "Failed to load wallet balances")
+      setError(getFriendlyErrorMessage(err))
     } finally {
       setLoading(false)
     }

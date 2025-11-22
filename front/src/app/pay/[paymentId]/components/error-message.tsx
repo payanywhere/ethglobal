@@ -16,8 +16,10 @@ export function ErrorMessage({ error }: ErrorMessageProps) {
           className="p-4 rounded-base border-2 border-border bg-red-50 dark:bg-red-950 shadow-shadow"
         >
           <div className="flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
-            <p className="text-sm font-heading text-red-600 dark:text-red-400">{error}</p>
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+            <p className="text-sm font-heading text-red-600 dark:text-red-400 whitespace-pre-wrap break-words max-h-32 overflow-y-auto leading-relaxed">
+              {error}
+            </p>
           </div>
         </motion.div>
       )}

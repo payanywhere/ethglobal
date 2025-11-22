@@ -1,31 +1,42 @@
 "use client"
 
-import { usePrivy } from "@privy-io/react-auth"
+import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import NavBar from "../components/NavBar"
 
 export default function LoginPage() {
-  const { ready, authenticated, login } = usePrivy()
+  const { isAuthenticated, isAuthLoading, sdkHasLoaded, setShowAuthFlow } = useDynamicContext()
+  const isLoggedIn = useIsLoggedIn()
   const router = useRouter()
 
+  // Redirect to dashboard if already authenticated
   useEffect(() => {
-    if (ready && authenticated) {
+    if (sdkHasLoaded && !isAuthLoading && (isAuthenticated || isLoggedIn)) {
       router.push("/dashboard")
     }
-  }, [ready, authenticated, router])
+  }, [isAuthenticated, isLoggedIn, isAuthLoading, sdkHasLoaded, router])
 
-  const handleLogin = () => {
-    login()
-  }
-
-  if (!ready) {
+  // Show loading while SDK is initializing
+  if (!sdkHasLoaded || isAuthLoading) {
     return (
       <main className="min-h-screen bg-background">
         <NavBar />
         <div className="flex items-center justify-center h-[80vh]">
           <div className="text-foreground">Loading...</div>
+        </div>
+      </main>
+    )
+  }
+
+  // If already authenticated, show loading while redirecting
+  if (isAuthenticated || isLoggedIn) {
+    return (
+      <main className="min-h-screen bg-background">
+        <NavBar />
+        <div className="flex items-center justify-center h-[80vh]">
+          <div className="text-foreground">Redirecting...</div>
         </div>
       </main>
     )
@@ -43,7 +54,7 @@ export default function LoginPage() {
             type="button"
             variant="default"
             className="w-full min-h-12 text-base font-bold"
-            onClick={handleLogin}
+            onClick={() => setShowAuthFlow(true)}
           >
             Sign In
           </Button>
