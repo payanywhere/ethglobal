@@ -1,22 +1,20 @@
 "use client"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function NavBar() {
   return (
-    <nav className="flex items-center justify-between bg-gray-900 text-white px-6 py-4">
-      <div className="text-xl font-bold">PayAnyWhere</div>
-      <ul className="flex space-x-6">
-        <li>
-          <Link href="/" className="hover:text-gray-300">
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link href="/login" className="hover:text-gray-300">
-            Dashboard
-          </Link>
-        </li>
-      </ul>
+    <nav className="flex items-center justify-between px-6 py-4 border-b-2 border-border mb-8">
+      <Link
+        href="/"
+        className="text-xl font-heading text-foreground hover:opacity-80 transition-opacity"
+      >
+        PayAnyWhere
+      </Link>
+      <section className="flex items-center gap-4">
+        <Button variant={"noShadow"} className="bg-transparent text-foreground">Home</Button>
+        <Button variant={"noShadow"} className="bg-transparent text-foreground">Dashboard</Button>
+      </section>
     </nav>
   )
 }
