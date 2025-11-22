@@ -2,7 +2,7 @@
 
 import { CheckCircle2, Clock, ExternalLink, Loader2, Plus } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { memo, useCallback, useEffect, useMemo, useState } from "react"
+import { Suspense, memo, useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -82,7 +82,7 @@ const PaymentRow = memo(({ payment }: { payment: PaymentRecord }) => {
 })
 PaymentRow.displayName = "PaymentRow"
 
-export default function PaymentsPage() {
+function PaymentsPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [payments, setPayments] = useState<PaymentRecord[]>([])
@@ -266,5 +266,17 @@ export default function PaymentsPage() {
         merchantId={merchantId}
       />
     </div>
+  )
+}
+
+export default function PaymentsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />
+      </div>
+    }>
+      <PaymentsPageContent />
+    </Suspense>
   )
 }
