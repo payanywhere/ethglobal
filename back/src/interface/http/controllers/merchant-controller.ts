@@ -1,6 +1,7 @@
 import type { Request, Response } from "express"
 import {
   getMerchantByEmailUseCase,
+  getMerchantByAddressUseCase,
   registerMerchantUseCase
 } from "../../../factories/use-case-factory"
 
@@ -32,6 +33,30 @@ export async function getMerchantByEmail(
 
     const useCase = getMerchantByEmailUseCase()
     const merchant = await useCase.execute(email)
+
+    if (!merchant) {
+      res.status(404).json({ error: "Merchant not found" })
+      return
+    }
+
+    res.json(merchant)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    res.status(500).json({ error: message })
+  }
+}
+
+
+export async function getMerchantByAddress(
+  req: Request,
+  res: Response<ErrorResponse | unknown>
+): Promise<void> {
+  try {
+    const { address } = req.params
+    console.log("Address path param:", address)
+
+    const useCase = getMerchantByAddressUseCase()
+    const merchant = await useCase.execute(address)
 
     if (!merchant) {
       res.status(404).json({ error: "Merchant not found" })

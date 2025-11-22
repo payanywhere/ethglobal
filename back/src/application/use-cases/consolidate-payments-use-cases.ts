@@ -6,8 +6,4 @@ export class ConsolidatePaymentsUseCase {
   async getPending(): Promise<number> {
     return this.consolidator.getPendingPayments()
   }
-
-  async consolidate(privateKey: string): Promise<string> {
-    return this.consolidator.consolidatePayments(privateKey)
-  }
 }

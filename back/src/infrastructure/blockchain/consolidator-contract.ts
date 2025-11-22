@@ -22,12 +22,4 @@ export class ConsolidatorContract {
     return Number(value)
   }
 
-  async consolidatePayments(privateKey: string): Promise<string> {
-    const provider = getProvider()
-    const wallet = new ethers.Wallet(privateKey, provider)
-    const contractWithSigner = this.contract.connect(wallet)
-    const incrementFn = contractWithSigner.getFunction("increment")
-    const tx = await incrementFn()
-    return tx.hash
-  }
 }
