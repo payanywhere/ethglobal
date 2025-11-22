@@ -1,8 +1,80 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useCallback, useState } from "react"
+import { WalletHeader } from "./components/wallet-header"
+import { TokenBalancesList } from "./components/token-balances-list"
+import { TransactionHistory } from "./components/transaction-history"
+import { usePrivyWallet } from "./hooks/use-privy-wallet"
+import { useWalletBalances } from "./hooks/use-wallet-balances"
+import { useWalletTransactions } from "./hooks/use-wallet-transactions"
 
 export default function WalletPage() {
+  const { walletAddress, ready } = usePrivyWallet()
+  const [showSendModal, setShowSendModal] = useState(false)
+  const [showReceiveModal, setShowReceiveModal] = useState(false)
+
+  // Custom hooks
+  const {
+    balances,
+    loading: loadingBalances,
+    error: balancesError,
+    totalValueUSD,
+    refetch: refetchBalances
+  } = useWalletBalances(walletAddress)
+
+  const {
+    transactions,
+    loading: loadingTransactions,
+    error: transactionsError
+  } = useWalletTransactions(walletAddress)
+
+  // Handlers
+  const handleSend = useCallback(() => {
+    // TODO: Implement send modal
+    setShowSendModal(true)
+    console.log("Send clicked")
+  }, [])
+
+  const handleReceive = useCallback(() => {
+    // TODO: Implement receive modal (show QR code)
+    setShowReceiveModal(true)
+    console.log("Receive clicked")
+  }, [])
+
+  if (!ready) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-heading font-bold">Wallet</h1>
+          <p className="text-foreground/50 text-sm">Manage your crypto wallet and transactions</p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <div className="w-12 h-12 animate-spin mx-auto text-foreground/50 border-4 border-foreground/20 border-t-foreground rounded-full" />
+            <p className="text-foreground/70">Loading wallet...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!walletAddress) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-heading font-bold">Wallet</h1>
+          <p className="text-foreground/50 text-sm">Manage your crypto wallet and transactions</p>
+        </div>
+        <div className="py-12 text-center">
+          <p className="text-foreground/50 mb-4">No wallet connected</p>
+          <p className="text-sm text-foreground/50">
+            Please connect your wallet in settings or create an embedded wallet.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -10,15 +82,29 @@ export default function WalletPage() {
         <p className="text-foreground/50 text-sm">Manage your crypto wallet and transactions</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Wallet Management</CardTitle>
-          <CardDescription>Coming soon</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-foreground/50">Wallet features will be available here.</p>
-        </CardContent>
-      </Card>
+      {/* Wallet Header with Total Balance and Quick Actions */}
+      <WalletHeader
+        totalValueUSD={totalValueUSD}
+        loading={loadingBalances}
+        onSend={handleSend}
+        onReceive={handleReceive}
+      />
+
+      {/* Token Balances and Transaction History - Side by side on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TokenBalancesList
+          tokens={balances}
+          loading={loadingBalances}
+          error={balancesError}
+          onRefresh={refetchBalances}
+        />
+        <TransactionHistory
+          transactions={transactions}
+          loading={loadingTransactions}
+          error={transactionsError}
+          address={walletAddress}
+        />
+      </div>
     </div>
   )
 }
