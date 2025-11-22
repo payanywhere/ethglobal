@@ -1,4 +1,5 @@
 import cors from "cors"
+import dotenv from "dotenv"
 import express from "express"
 import { connectDB } from "./infrastructure/db/connection"
 
@@ -7,6 +8,7 @@ import healthRoutes from "./interface/http/routes/health-routes"
 import merchantRoutes from "./interface/http/routes/merchant-routes"
 import paymentRoutes from "./interface/http/routes/payment-routes"
 
+dotenv.config()
 async function bootstrap(): Promise<void> {
   const app = express()
   app.use(cors({ origin: "*" }))
