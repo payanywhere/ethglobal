@@ -1,5 +1,5 @@
 import { ArrowDownToLine, ArrowUpRight, ExternalLink, Loader2 } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
+import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Transaction } from "../hooks/use-wallet-transactions"
@@ -18,17 +18,61 @@ export function TransactionHistory({
   address
 }: TransactionHistoryProps) {
   const viewOnExplorer = (hash: string, chainId: number) => {
-    // Simple chain mapping - can be expanded
+    // Complete chain mapping with all major networks
     const explorerUrls: Record<number, string> = {
       1: "https://etherscan.io",
+      56: "https://bscscan.com",
       137: "https://polygonscan.com",
       42161: "https://arbiscan.io",
       8453: "https://basescan.org",
-      10: "https://optimistic.etherscan.io"
+      10: "https://optimistic.etherscan.io",
+      43114: "https://snowtrace.io",
+      250: "https://ftmscan.com",
+      100: "https://gnosisscan.io",
+      42220: "https://celoscan.io"
     }
 
     const baseUrl = explorerUrls[chainId] || "https://etherscan.io"
     window.open(`${baseUrl}/tx/${hash}`, "_blank", "noopener,noreferrer")
+  }
+
+  const getChainName = (chainId: number): string => {
+    const chains: Record<number, string> = {
+      1: "Ethereum",
+      56: "BSC",
+      137: "Polygon",
+      42161: "Arbitrum",
+      10: "Optimism",
+      8453: "Base",
+      43114: "Avalanche",
+      250: "Fantom",
+      100: "Gnosis",
+      42220: "Celo"
+    }
+    return chains[chainId] || `Chain ${chainId}`
+  }
+
+  const formatDate = (timestamp: number): string => {
+    const date = new Date(timestamp * 1000)
+    const now = new Date()
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+
+    // If less than 24 hours ago, show relative time
+    if (diffInHours < 24) {
+      const diffInMinutes = Math.floor(diffInHours * 60)
+      if (diffInMinutes < 1) return "Just now"
+      if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+      return `${Math.floor(diffInHours)}h ago`
+    }
+
+    // If less than 7 days ago, show "X days ago"
+    if (diffInHours < 24 * 7) {
+      const days = Math.floor(diffInHours / 24)
+      return `${days}d ago`
+    }
+
+    // Otherwise show formatted date
+    return format(date, "MMM d, yyyy")
   }
 
   if (loading && transactions.length === 0) {
@@ -85,7 +129,10 @@ export function TransactionHistory({
         <div className="space-y-2">
           {transactions.map((tx) => {
             const isReceive = tx.type === "receive"
-            const timestamp = new Date(tx.timestamp * 1000)
+            const formattedValue = tx.token
+              ? (Number(tx.value) / Math.pow(10, tx.token.decimals)).toFixed(6)
+              : (Number(tx.value) / 1e18).toFixed(6)
+            const symbol = tx.token?.symbol || "ETH"
 
             return (
               <div
@@ -108,7 +155,7 @@ export function TransactionHistory({
                     <div className="min-w-0">
                       <p className="font-heading font-semibold capitalize">{tx.type}</p>
                       <p className="text-sm text-foreground/50">
-                        {formatDistanceToNow(timestamp, { addSuffix: true })}
+                        {formatDate(tx.timestamp)} · {getChainName(tx.chain_id)}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
@@ -118,9 +165,7 @@ export function TransactionHistory({
                         }`}
                       >
                         {isReceive ? "+" : "-"}
-                        {tx.token
-                          ? `${(Number(tx.value) / Math.pow(10, tx.token.decimals)).toFixed(6)} ${tx.token.symbol}`
-                          : `${(Number(tx.value) / 1e18).toFixed(6)} ETH`}
+                        {formattedValue} {symbol}
                       </p>
                       <p className="text-sm text-foreground/50">
                         {tx.status === "pending" ? "Pending" : tx.status === "failed" ? "Failed" : "Confirmed"}
