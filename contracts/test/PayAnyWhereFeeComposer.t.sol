@@ -25,12 +25,27 @@ contract MockOFT {
     }
 }
 
+contract MockAaveV3Pool {
+    mapping(address => uint256) public supplied;
+
+    function supply(
+        address,
+        /* asset */
+        uint256 amount,
+        address onBehalfOf,
+        uint16 /* code */
+    ) external {
+        supplied[onBehalfOf] += amount;
+    }
+}
+
 contract PayAnyWhereFeeComposerTest is Test {
     ERC20Mock token;
     PayAnyWhereFeeComposer composer;
     MockOFT oft;
 
     address public constant PAYANYWHERE = address(0xBEEF);
+    MockAaveV3Pool aave;
 
     function setUp() public {
         token = new ERC20Mock("Mock", "MOCK");
@@ -38,8 +53,12 @@ contract PayAnyWhereFeeComposerTest is Test {
         oft = new MockOFT(address(token), address(this));
 
         // feeBps = 100 -> 1%
-        composer = new PayAnyWhereFeeComposer(PAYANYWHERE, address(oft), 100);
 
+        // deploy mock aave and composer
+        aave = new MockAaveV3Pool();
+        composer = new PayAnyWhereFeeComposer(PAYANYWHERE, address(aave), address(oft), 100);
+
+        // mint tokens to the composer contract (not required for MockAave but harmless)
         // mint tokens to the composer contract so handleCompose can forward them
         token.mint(address(composer), 1000 ether);
     }
@@ -61,7 +80,8 @@ contract PayAnyWhereFeeComposerTest is Test {
         uint256 expectedFee = (amount * 100) / 10_000;
         uint256 expectedNet = amount - expectedFee;
 
-        assertEq(token.balanceOf(PAYANYWHERE), expectedFee);
-        assertEq(token.balanceOf(recipient), expectedNet);
+        // MockAave should have recorded supplies for recipient and PAYANYWAY
+        assertEq(aave.supplied(recipient), expectedNet);
+        assertEq(aave.supplied(PAYANYWHERE), expectedFee);
     }
 }

@@ -8,10 +8,11 @@ contract DeployPayAnyWhereFeeComposer is Script {
     function run() external returns (address) {
         address payAnyWhere = vm.envAddress("PAYANYWHERE");
         address oftIn = vm.envAddress("OFT_IN");
+        address aavePool = vm.envAddress("AAVE_POOL");
         uint256 feeBps = vm.envUint("FEE_BPS");
 
         vm.startBroadcast();
-        PayAnyWhereFeeComposer composer = new PayAnyWhereFeeComposer(payAnyWhere, oftIn, uint16(feeBps));
+        PayAnyWhereFeeComposer composer = new PayAnyWhereFeeComposer(payAnyWhere, aavePool, oftIn, uint16(feeBps));
         vm.stopBroadcast();
 
         return address(composer);
