@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import NavBar from "./components/NavBar"
 import Image from "next/image"
 import Marquee from "@/components/ui/marquee"
+import { ArrowRightIcon } from "lucide-react"
 
 const paymentBenefits = [
   "Global Payments",
@@ -22,12 +23,15 @@ export default function Home() {
       <section className="w-full min-h-[50vh] flex flex-col md:flex-row items-center h-[calc(100vh-250px)] relative top-10">
         <div className="flex-1 flex flex-col justify-center px-8 md:px-12">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Welcome to PayAnyWhere
+            Accept crypto anywhere in the world
           </h1>
           <p className="text-lg md:text-xl text-gray-600">
-            Hybrid payments for global crypto events.
+            Any token, any fiat currency, in one place.
           </p>
-          <Button variant={"default"} className="mt-6 w-fit min-w-60 min-h-12 text-lg font-bold">Get Started</Button>
+          <Button variant={"default"} className="mt-6 w-fit min-w-60 min-h-12 text-lg font-bold">
+            Get Started
+            <ArrowRightIcon className="min-w-5 min-h-5" />
+          </Button>
         </div>
         <div className="flex-1 w-full h-[40vh] relative flex items-center justify-center">
           <Image
