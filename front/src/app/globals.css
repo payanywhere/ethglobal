@@ -1,5 +1,8 @@
 @import "tailwindcss";
+
 @import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* Satoshi Font - Method 1: @font-face with multiple formats */
 @font-face {
@@ -13,14 +16,110 @@
   font-style: normal;
 }
 
+:root {
+  --background: oklch(96.47% 0.0401 157.79);
+
+  --secondary-background: oklch(100% 0 0);
+
+  --foreground: oklch(0% 0 0);
+
+  --main-foreground: oklch(0% 0 0);
+
+  --main: oklch(79.76% 0.2044 153.08);
+
+  --border: oklch(0% 0 0);
+
+  --ring: oklch(0% 0 0);
+
+  --overlay: oklch(0% 0 0 / 0.8);
+
+  --shadow: 4px 4px 0px 0px var(--border);
+
+  --chart-1: #00D696;
+
+  --chart-2: #FF7A05;
+
+  --chart-3: #0099FF;
+
+  --chart-4: #FFBF00;
+
+  --chart-5: #7A83FF;
+
+  --chart-active-dot: #000;
+}
+
+.dark {
+  --background: oklch(22.45% 0.0316 158.41);
+
+  --secondary-background: oklch(23.93% 0 0);
+
+  --foreground: oklch(92.49% 0 0);
+
+  --main-foreground: oklch(0% 0 0);
+
+  --main: oklch(73.03% 0.1865 153.23);
+
+  --border: oklch(0% 0 0);
+
+  --ring: oklch(100% 0 0);
+
+  --shadow: 4px 4px 0px 0px var(--border);
+
+  --chart-1: #00BD84;
+
+  --chart-2: #EB6D00;
+
+  --chart-3: #008AE5;
+
+  --chart-4: #E5AC00;
+
+  --chart-5: #7A83FF;
+
+  --chart-active-dot: #fff;
+}
+
 @theme inline {
-  /* Neobrutalism v4 Color Variables */
+  --color-main: var(--main);
+
   --color-background: var(--background);
+
   --color-secondary-background: var(--secondary-background);
+
   --color-foreground: var(--foreground);
+
   --color-main-foreground: var(--main-foreground);
+
   --color-border: var(--border);
-  --color-shadow: var(--shadow);
+
+  --color-overlay: var(--overlay);
+
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+
+  --color-chart-2: var(--chart-2);
+
+  --color-chart-3: var(--chart-3);
+
+  --color-chart-4: var(--chart-4);
+
+  --color-chart-5: var(--chart-5);
+
+  --spacing-boxShadowX: 4px;
+
+  --spacing-boxShadowY: 4px;
+
+  --spacing-reverseBoxShadowX: -4px;
+
+  --spacing-reverseBoxShadowY: -4px;
+
+  --radius-base: 5px;
+
+  --shadow-shadow: var(--shadow);
+
+  --font-weight-base: 500;
+
+  --font-weight-heading: 700;
 
   /* Font Variables */
   --font-sans: var(
@@ -34,54 +133,53 @@
   );
   --font-mono: var(--font-satoshi, "Satoshi-Variable", "Satoshi", "SF Pro", system-ui, monospace);
 
-  /* Border Radius */
-  --radius: 0.5rem;
+  --animate-marquee: marquee 20s linear infinite;
+
+  --animate-marquee2: marquee2 20s linear infinite;
 }
 
-:root {
-  /* Neobrutalism v4 Light Theme - Green */
-  --background: #ffffff;
-  --secondary-background: #f0fdf4;
-  --foreground: #166534;
-  --main-foreground: #166534;
-  --border: #22c55e;
-  --shadow: 4px 4px 0px 0px #22c55e;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Neobrutalism v4 Dark Theme - Green */
-    --background: #0a0a0a;
-    --secondary-background: #052e16;
-    --foreground: #86efac;
-    --main-foreground: #86efac;
-    --border: #22c55e;
-    --shadow: 4px 4px 0px 0px #22c55e;
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
   }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  border-color: var(--border);
-  font-family:
-    "Satoshi-Variable", var(--font-satoshi), "Satoshi", "SF Pro", system-ui, arial, sans-serif;
+@keyframes marquee2 {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    "Satoshi-Variable", var(--font-satoshi), "Satoshi", "SF Pro", system-ui, arial, sans-serif;
-}
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-color: var(--border);
+    font-family:
+      "Satoshi-Variable", var(--font-satoshi), "Satoshi", "SF Pro", system-ui, arial, sans-serif;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family:
-    "Satoshi-Variable", var(--font-satoshi), "Satoshi", "SF Pro", system-ui, arial, sans-serif;
+  body {
+    @apply text-foreground font-base bg-background;
+    font-family:
+      "Satoshi-Variable", var(--font-satoshi), "Satoshi", "SF Pro", system-ui, arial, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    font-family:
+      "Satoshi-Variable", var(--font-satoshi), "Satoshi", "SF Pro", system-ui, arial, sans-serif;
+  }
+
+  .marquee-section::-webkit-scrollbar,
+  .marquee-section > div::-webkit-scrollbar {
+    display: none;
+  }
 }
