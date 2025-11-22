@@ -102,6 +102,8 @@ const nextConfig: NextConfig = {
                 https://relay.walletconnect.org
                 https://relay.walletconnect.com
                 https://api.sim.dune.com
+                https://coins.llama.fi
+                https://*.llama.fi
                 https://cloudflare-eth.com
                 https://*.infura.io
                 https://*.alchemy.com
