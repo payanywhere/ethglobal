@@ -1,9 +1,7 @@
-import * as React from "react"
-
-import { buttonVariants } from "@/components/ui/button"
-
-import { cn } from "@/lib/utils"
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
+import type * as React from "react"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -17,10 +15,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   )
 }
 
-function PaginationContent({
-  className,
-  ...props
-}: React.ComponentProps<"ul">) {
+function PaginationContent({ className, ...props }: React.ComponentProps<"ul">) {
   return (
     <ul
       data-slot="pagination-content"
@@ -31,9 +26,7 @@ function PaginationContent({
 }
 
 function PaginationItem({ className, ...props }: React.ComponentProps<"li">) {
-  return (
-    <li data-slot="pagination-item" className={cn("", className)} {...props} />
-  )
+  return <li data-slot="pagination-item" className={cn("", className)} {...props} />
 }
 
 function PaginationLink({
@@ -52,20 +45,17 @@ function PaginationLink({
       className={cn(
         buttonVariants({
           variant: "noShadow",
-          size,
+          size
         }),
         className,
-        isActive && "bg-black text-white",
+        isActive && "bg-black text-white"
       )}
       {...props}
     />
   )
 }
 
-function PaginationPrevious({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
       data-slot="pagination-previous"
@@ -80,10 +70,7 @@ function PaginationPrevious({
   )
 }
 
-function PaginationNext({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
       data-slot="pagination-next"
@@ -98,10 +85,7 @@ function PaginationNext({
   )
 }
 
-function PaginationEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="pagination-ellipsis"
@@ -122,5 +106,5 @@ export {
   PaginationItem,
   PaginationLink,
   PaginationNext,
-  PaginationPrevious,
+  PaginationPrevious
 }
