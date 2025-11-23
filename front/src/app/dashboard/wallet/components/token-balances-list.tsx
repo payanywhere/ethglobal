@@ -1,4 +1,5 @@
 import { RefreshCw } from "lucide-react"
+import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -43,6 +44,15 @@ function TokenBalanceSkeleton() {
 }
 
 export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBalancesListProps) {
+  // Generate stable skeleton keys that don't change between renders
+  const skeletonKeys = useMemo(() => {
+    return Array.from({ length: 5 }, (_, i) => `skeleton-loading-${i}`)
+  }, [])
+
+  const refreshSkeletonKeys = useMemo(() => {
+    return Array.from({ length: 2 }, (_, i) => `skeleton-refresh-${i}`)
+  }, [])
+
   if (loading && tokens.length === 0) {
     return (
       <Card>
@@ -51,8 +61,8 @@ export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBa
         </CardHeader>
         <CardContent className="pb-4">
           <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <TokenBalanceSkeleton key={i} />
+            {skeletonKeys.map((key) => (
+              <TokenBalanceSkeleton key={key} />
             ))}
           </div>
         </CardContent>
@@ -122,8 +132,8 @@ export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBa
                 <TokenBalanceItem key={`${token.chain_id}-${token.address}`} token={token} />
               ))}
               {/* Show a few skeletons at the end while refreshing */}
-              {[...Array(2)].map((_, i) => (
-                <TokenBalanceSkeleton key={`skeleton-${i}`} />
+              {refreshSkeletonKeys.map((key) => (
+                <TokenBalanceSkeleton key={key} />
               ))}
             </>
           ) : (

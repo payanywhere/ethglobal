@@ -1,5 +1,6 @@
 import { CdpClient } from "@coinbase/cdp-sdk"
 import { type NextRequest, NextResponse } from "next/server"
+import type { CdpSupportedNetwork } from "@/services/cdp-trade"
 
 function getCdpClient(): CdpClient {
   const apiKeyId = process.env.CDP_API_KEY_APPID
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
       const cdp = getCdpClient()
 
       const priceData = await cdp.evm.getSwapPrice({
-        network: network as any,
+        network: network as CdpSupportedNetwork,
         fromToken: fromToken as `0x${string}`,
         toToken: toToken as `0x${string}`,
         fromAmount: BigInt(fromAmount),
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
       // Use createSwapQuote directly with the user's wallet address as taker
       // This ensures the swapped tokens go to the USER's wallet, not a CDP account!
       const swapQuote = await cdp.evm.createSwapQuote({
-        network: network as any,
+        network: network as CdpSupportedNetwork,
         fromToken: fromToken as `0x${string}`,
         toToken: toToken as `0x${string}`,
         fromAmount: BigInt(fromAmount),
@@ -118,12 +119,29 @@ export async function POST(request: NextRequest) {
       }
 
       // Extract transaction data
-      const transactionData: any = {
+      interface TransactionData {
+        liquidityAvailable: boolean
+        to?: string
+        data?: string
+        value?: string
+        gasLimit?: string
+        toAmount?: string
+        minToAmount?: string
+        permit2?: unknown
+      }
+
+      const transactionData: TransactionData = {
         liquidityAvailable: true
       }
 
       if ("transaction" in swapQuote && swapQuote.transaction) {
-        const tx = swapQuote.transaction as any
+        const tx = swapQuote.transaction as {
+          to?: string
+          data?: string
+          value?: bigint
+          gasLimit?: bigint
+          gas?: bigint
+        }
         transactionData.to = tx.to || ""
         transactionData.data = tx.data || ""
         transactionData.value = tx.value ? String(tx.value) : "0"
