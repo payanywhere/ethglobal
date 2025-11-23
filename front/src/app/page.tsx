@@ -63,7 +63,7 @@ export default function Home() {
           />
         </div>
       </section>
-      <section className="marquee-section w-full overflow-visible py-8 my-8">
+      <section className="marquee-section relative top-[-30px] w-full overflow-visible py-8 mb-8">
         <div className="w-full overflow-visible">
           <Marquee items={paymentBenefits} className="rotate-[-1deg] origin-top" />
         </div>
