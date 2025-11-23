@@ -6,6 +6,7 @@ import { TokenBalancesList } from "./components/token-balances-list"
 import { TransactionHistory } from "./components/transaction-history"
 import { ReceiveOverlay } from "./components/receive-overlay"
 import { SendOverlay } from "./components/send-overlay"
+import { SwapOverlay } from "./components/swap-overlay"
 import { useMerchantWallet } from "./hooks/use-merchant-wallet"
 import { useWalletBalances } from "./hooks/use-wallet-balances"
 import { useWalletTransactions } from "./hooks/use-wallet-transactions"
@@ -14,6 +15,7 @@ export default function WalletPage() {
   const { walletAddress, ready } = useMerchantWallet()
   const [showSendModal, setShowSendModal] = useState(false)
   const [showReceiveModal, setShowReceiveModal] = useState(false)
+  const [showSwapModal, setShowSwapModal] = useState(false)
 
   // Custom hooks
   const {
@@ -43,6 +45,15 @@ export default function WalletPage() {
   const handleReceive = useCallback(() => {
     setShowReceiveModal(true)
   }, [])
+
+  const handleSwap = useCallback(() => {
+    setShowSwapModal(true)
+  }, [])
+
+  const handleSwapSuccess = useCallback(() => {
+    // Refresh balances after successful swap
+    refetchBalances()
+  }, [refetchBalances])
 
   if (!ready) {
     return (
@@ -91,6 +102,7 @@ export default function WalletPage() {
         loading={loadingBalances}
         onSend={handleSend}
         onReceive={handleReceive}
+        onSwap={handleSwap}
       />
 
       {/* Token Balances and Transaction History - Side by side on desktop */}
@@ -122,6 +134,14 @@ export default function WalletPage() {
         onOpenChange={setShowSendModal}
         tokens={balances}
         onSuccess={handleSendSuccess}
+      />
+
+      {/* Swap Overlay */}
+      <SwapOverlay
+        open={showSwapModal}
+        onOpenChange={setShowSwapModal}
+        tokens={balances}
+        onSuccess={handleSwapSuccess}
       />
     </div>
   )

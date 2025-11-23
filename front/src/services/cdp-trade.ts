@@ -132,12 +132,34 @@ function validateNetwork(network: string): asserts network is CdpSupportedNetwor
 /**
  * Get CDP client instance
  * Creates a singleton client for reuse across requests
+ * 
+ * Configuration via environment variables:
+ * - CDP_API_KEY_APPID: Your CDP API key ID
+ * - CDP_API_KEY_SECRET: Your CDP API key secret
+ * - CDP_WALLET_SECRET: Your CDP wallet secret
+ * 
+ * Get credentials from: https://portal.cdp.coinbase.com/
  */
 let cdpClientInstance: CdpClient | null = null
 
 function getCdpClient(): CdpClient {
   if (!cdpClientInstance) {
-    cdpClientInstance = new CdpClient()
+    const apiKeyId = process.env.CDP_API_KEY_APPID
+    const apiKeySecret = process.env.CDP_API_KEY_SECRET
+    const walletSecret = process.env.CDP_WALLET_SECRET
+
+    if (!apiKeyId || !apiKeySecret || !walletSecret) {
+      console.warn(
+        "CDP API credentials not configured. Set CDP_API_KEY_APPID, CDP_API_KEY_SECRET, and CDP_WALLET_SECRET environment variables. " +
+        "Get credentials from: https://portal.cdp.coinbase.com/"
+      )
+    }
+
+    cdpClientInstance = new CdpClient({
+      apiKeyId: apiKeyId || "",
+      apiKeySecret: apiKeySecret || "",
+      walletSecret: walletSecret || ""
+    })
   }
   return cdpClientInstance
 }
@@ -169,19 +191,35 @@ export async function estimateSwapPrice(
   validateNetwork(params.network)
 
   try {
-    const cdp = getCdpClient()
-    const swapPrice = await cdp.evm.getSwapPrice({
+    // Build query parameters
+    const queryParams = new URLSearchParams({
       fromToken: params.fromToken,
       toToken: params.toToken,
-      fromAmount: params.fromAmount,
+      fromAmount: params.fromAmount.toString(),
       network: params.network,
       taker: params.taker
     })
 
+    // Call our backend API which handles CDP authentication
+    const response = await fetch(`/api/swap?${queryParams.toString()}`, {
+      method: 'GET',
+      cache: 'no-store' // Always get fresh prices
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(
+        errorData.message || `Failed to get price estimate: ${response.status}`
+      )
+    }
+
+    const priceData = await response.json()
+
+    // Return formatted price estimate
     return {
-      toAmount: swapPrice.toAmount,
-      minToAmount: swapPrice.minToAmount,
-      liquidityAvailable: swapPrice.liquidityAvailable
+      toAmount: BigInt(priceData.toAmount || '0'),
+      minToAmount: BigInt(priceData.minToAmount || '0'),
+      liquidityAvailable: priceData.liquidityAvailable !== false
     }
   } catch (error) {
     console.error("Error estimating swap price:", error)
@@ -348,9 +386,114 @@ export async function waitForUserOperation(
 }
 
 /**
+ * Get swap transaction data for external wallets (client-side)
+ * 
+ * For use with external wallets (e.g., Dynamic.xyz, MetaMask, etc.)
+ * Calls the API endpoint which handles CDP authentication server-side
+ * 
+ * @param params Swap parameters including taker address
+ * @returns Transaction data ready to be sent
+ */
+export async function getSwapTransaction(
+  params: SwapParams & { taker: string }
+): Promise<{
+  to: string
+  data: string
+  value: string
+  gasLimit?: string
+}> {
+  validateNetwork(params.network)
+
+  try {
+    const response = await fetch("/api/swap", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fromToken: params.fromToken,
+        toToken: params.toToken,
+        fromAmount: params.fromAmount.toString(),
+        network: params.network,
+        slippageBps: params.slippageBps,
+        taker: params.taker
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || errorData.error || `HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    return {
+      to: data.to,
+      data: data.data,
+      value: data.value || "0",
+      gasLimit: data.gasLimit
+    }
+  } catch (error) {
+    console.error("Error getting swap transaction:", error)
+    throw new Error(
+      `Failed to get swap transaction: ${error instanceof Error ? error.message : "Unknown error"}`
+    )
+  }
+}
+
+/**
+ * Execute swap with external wallet (Dynamic.xyz, MetaMask, etc.)
+ * 
+ * Gets transaction data from CDP and sends it using the provided wallet
+ * 
+ * @param walletProvider Wallet provider from Dynamic.xyz or other wallet
+ * @param walletAddress User's wallet address
+ * @param params Swap parameters
+ * @returns Transaction hash
+ */
+export async function executeSwapWithExternalWallet(
+  walletProvider: any,
+  walletAddress: string,
+  params: SwapParams
+): Promise<string> {
+  validateNetwork(params.network)
+
+  try {
+    // Get transaction data from CDP
+    const txData = await getSwapTransaction({
+      ...params,
+      taker: walletAddress
+    })
+
+    // Send transaction using wallet provider
+    const txHash = await walletProvider.request({
+      method: "eth_sendTransaction",
+      params: [
+        {
+          from: walletAddress,
+          to: txData.to,
+          data: txData.data,
+          value: txData.value,
+          gas: txData.gasLimit ? `0x${BigInt(txData.gasLimit).toString(16)}` : undefined
+        }
+      ]
+    })
+
+    return txHash
+  } catch (error) {
+    console.error("Error executing swap with external wallet:", error)
+    throw new Error(
+      `Failed to execute swap: ${error instanceof Error ? error.message : "Unknown error"}`
+    )
+  }
+}
+
+/**
  * Get or create a CDP account
  * 
  * Helper function to get an existing account or create a new one.
+ * NOTE: This requires CDP API credentials. Use executeSwapWithExternalWallet 
+ * for external wallets (Dynamic.xyz, MetaMask, etc.)
  * 
  * @param accountName Unique name for the account
  * @returns CDP account instance
@@ -372,6 +515,8 @@ export async function getOrCreateAccount(accountName: string): Promise<Account> 
  * 
  * Helper function to get an existing Smart Account or create a new one.
  * Smart Accounts support gas sponsorship, batch operations, and enhanced security.
+ * NOTE: This requires CDP API credentials. Use executeSwapWithExternalWallet
+ * for external wallets (Dynamic.xyz, MetaMask, etc.)
  * 
  * @param accountName Unique name for the account
  * @returns CDP Smart Account instance
