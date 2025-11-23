@@ -1,7 +1,9 @@
+# Basic env vars
 NEXT_PUBLIC_ENVIRONMENT=local
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
+# MercadoPago API KEY
 MP_PUBLIC_KEY=TEST-...
 MP_ACCESS_TOKEN=TEST-....
 
@@ -16,3 +18,6 @@ NEXT_PUBLIC_DYNAMIC_ENV_ID=your-dynamic-environment-id
 CDP_API_KEY_APPID=your-api-key-id-from-json
 CDP_API_KEY_SECRET=your-private-key-from-json
 CDP_WALLET_SECRET=your-wallet-secret
+
+# PayAnyWhere - Fee Composer Contract (Polygon)
+PAYANYWHERE_FEE_COMPOSER_ADDRESS=0x9589b37aB31d25D1cB8677064ac19b5b83CB334D
