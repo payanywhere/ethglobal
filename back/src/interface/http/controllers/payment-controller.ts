@@ -2,6 +2,7 @@ import type { Request, Response } from "express"
 import {
   createPaymentUseCase,
   getPaymentByUuidUseCase,
+  getPaymentsByMerchantAddressUseCase,
   getPaymentsByMerchantUseCase,
   updatePaymentStatusUseCase
 } from "../../../factories/use-case-factory"
@@ -36,6 +37,21 @@ export async function getPaymentsByMerchant(
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error"
     res.status(400).json({ error: message })
+  }
+}
+
+export async function getPaymentsByMerchantAddress(
+  req: Request,
+  res: Response<ErrorResponse | unknown[]>
+): Promise<void> {
+  try {
+    const { address } = req.params
+    const useCase = getPaymentsByMerchantAddressUseCase()
+    const payments = await useCase.execute(address)
+    res.json(payments)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    res.status(404).json({ error: message })
   }
 }
 

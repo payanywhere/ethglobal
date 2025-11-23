@@ -14,6 +14,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { MerchantProvider, useMerchant } from "@/contexts/merchant-context"
+import { useMerchantVerification } from "@/hooks/use-merchant-verification"
 import {
   Sidebar,
   SidebarContent,
@@ -58,41 +60,17 @@ const menuItems = [
   }
 ]
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { handleLogOut, isAuthenticated, isAuthLoading, sdkHasLoaded } = useDynamicContext()
-  const isLoggedIn = useIsLoggedIn()
-  const router = useRouter()
-
-  // Protect dashboard routes - redirect to login if not authenticated
-  useEffect(() => {
-    if (sdkHasLoaded && !isAuthLoading && !isAuthenticated && !isLoggedIn) {
-      router.push("/login")
-    }
-  }, [isAuthenticated, isLoggedIn, isAuthLoading, sdkHasLoaded, router])
+  const { handleLogOut, primaryWallet } = useDynamicContext()
+  const { walletAddress } = useMerchant()
 
   const handleLogout = async () => {
     await handleLogOut()
-    router.push("/")
+    window.location.href = "/"
   }
 
-  // Show loading while checking auth status
-  if (!sdkHasLoaded || isAuthLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-foreground">Loading...</div>
-      </div>
-    )
-  }
-
-  // Show loading while redirecting unauthenticated users
-  if (!isAuthenticated && !isLoggedIn) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-foreground">Redirecting...</div>
-      </div>
-    )
-  }
+  const displayAddress = walletAddress || primaryWallet?.address || null
 
   return (
     <SidebarProvider>
@@ -168,8 +146,80 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Menu className="h-5 w-5" />
           </SidebarTrigger>
         </header>
-        <div className="flex flex-1 flex-col gap-6 p-6">{children}</div>
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          {displayAddress && (
+            <div className="flex items-center gap-2 text-sm text-foreground/70">
+              <span>Address:</span>
+              <span className="font-mono text-foreground">{displayAddress}</span>
+            </div>
+          )}
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+function MerchantVerificationWrapper({ children }: { children: React.ReactNode }) {
+  const {
+    isVerifying,
+    merchantVerified,
+    error: merchantError
+  } = useMerchantVerification()
+
+  // Show loading while verifying merchant
+  if (isVerifying) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-foreground">Verificando merchant...</div>
+      </div>
+    )
+  }
+
+  if (merchantError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-500">Error: {merchantError}</div>
+      </div>
+    )
+  }
+
+  return <DashboardContent>{children}</DashboardContent>
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isAuthLoading, sdkHasLoaded } = useDynamicContext()
+  const isLoggedIn = useIsLoggedIn()
+  const router = useRouter()
+
+  // Protect dashboard routes - redirect to login if not authenticated
+  useEffect(() => {
+    if (sdkHasLoaded && !isAuthLoading && !isAuthenticated && !isLoggedIn) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, isLoggedIn, isAuthLoading, sdkHasLoaded, router])
+
+  // Show loading while checking auth status
+  if (!sdkHasLoaded || isAuthLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    )
+  }
+
+  // Show loading while redirecting unauthenticated users
+  if (!isAuthenticated && !isLoggedIn) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-foreground">Redirecting...</div>
+      </div>
+    )
+  }
+
+  return (
+    <MerchantProvider>
+      <MerchantVerificationWrapper>{children}</MerchantVerificationWrapper>
+    </MerchantProvider>
   )
 }

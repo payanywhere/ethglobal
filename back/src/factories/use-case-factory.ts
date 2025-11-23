@@ -4,10 +4,12 @@ import { CreatePaymentUseCase } from "../application/use-cases/create-payment-us
 import { GetCashierByUuidUseCase } from "../application/use-cases/get-cashier-by-uuid-use-case"
 import { GetCashierDetailsUseCase } from "../application/use-cases/get-cashier-details-use-case"
 import { GetCashiersByMerchantUseCase } from "../application/use-cases/get-cashiers-by-merchant-use-case"
+import { GetCashiersByMerchantAddressUseCase } from "../application/use-cases/get-cashiers-by-merchant-address-use-case"
 import { GetMerchantByAddressUseCase } from "../application/use-cases/get-merchant-by-address-use-case"
 import { GetMerchantByEmailUseCase } from "../application/use-cases/get-merchant-by-email-use-case"
 import { GetMerchantsUseCase } from "../application/use-cases/get-merchants-use-case"
 import { GetPaymentByUuidUseCase } from "../application/use-cases/get-payment-by-uuid-use-case"
+import { GetPaymentsByMerchantAddressUseCase } from "../application/use-cases/get-payments-by-merchant-address-use-case"
 import { GetPaymentsByMerchantUseCase } from "../application/use-cases/get-payments-by-merchant-use-case"
 import { RegisterMerchant } from "../application/use-cases/register-merchant"
 import { UpdatePaymentStatusUseCase } from "../application/use-cases/update-payment-status-use-case"
@@ -29,6 +31,10 @@ export function createPaymentUseCase(): CreatePaymentUseCase {
 
 export function getPaymentsByMerchantUseCase(): GetPaymentsByMerchantUseCase {
   return new GetPaymentsByMerchantUseCase(paymentRepository)
+}
+
+export function getPaymentsByMerchantAddressUseCase(): GetPaymentsByMerchantAddressUseCase {
+  return new GetPaymentsByMerchantAddressUseCase(merchantRepository, paymentRepository)
 }
 
 export function getPaymentByUuidUseCase(): GetPaymentByUuidUseCase {
@@ -67,6 +73,10 @@ export function getCashierByUuidUseCase(): GetCashierByUuidUseCase {
 
 export function getCashiersByMerchantUseCase(): GetCashiersByMerchantUseCase {
   return new GetCashiersByMerchantUseCase(cashierRepository)
+}
+
+export function getCashiersByMerchantAddressUseCase(): GetCashiersByMerchantAddressUseCase {
+  return new GetCashiersByMerchantAddressUseCase(merchantRepository, cashierRepository)
 }
 
 export function getCashierDetailsUseCase(): GetCashierDetailsUseCase {

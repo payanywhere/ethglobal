@@ -113,6 +113,13 @@ Get all cashiers of a merchant
 curl -X GET http://localhost:3000/cashiers/merchant/507f1f77bcf86cd799439011
 ```
 
+### GET /cashiers/merchant/address/:address
+Get all cashiers of a merchant by wallet address (0x..)
+
+```bash
+curl -X GET http://localhost:3000/cashiers/merchant/address/0x2F2F8095c8C9631b7D1C96BBB44FBCe4f620ceB3
+```
+
 ### GET /cashiers/:uuid/details
 Get all cashier details (includes merchant info and payments)
 
@@ -134,7 +141,9 @@ curl -X POST http://localhost:3000/payments \
     "cashierId": "1eb5c298-b0eb-4032-97a5-8ad9d47b249f",
     "amount": 123.45,
     "token": "USDC",
-    "network": "polygon"
+    "network": "polygon",
+    "description": "Payment description (optional)",
+    "email": "customer@example.com (optional)"
   }'
 ```
 
@@ -143,6 +152,13 @@ Get a payment by its UUID
 
 ```bash
 curl -X GET http://localhost:3000/payment/507f1f77bcf86cd799439011
+```
+
+### GET /payments/address/:address
+Retrieves all payments for a merchant by wallet address
+
+```bash
+curl -X GET http://localhost:3000/payments/address/0x1234567890123456789012345678901234567890
 ```
 
 ### GET /payments/:merchantId

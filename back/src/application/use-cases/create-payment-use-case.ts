@@ -8,6 +8,8 @@ export interface CreatePaymentDTO {
   amount: number
   token: string
   network: string
+  description?: string
+  email?: string
 }
 
 export class CreatePaymentUseCase {
@@ -86,7 +88,9 @@ export class CreatePaymentUseCase {
       amount: dto.amount,
       token: dto.token,
       network: dto.network,
-      status: "pending"
+      status: "pending",
+      description: dto.description,
+      email: dto.email
     })
 
     return payment
