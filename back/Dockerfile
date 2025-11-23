@@ -6,6 +6,8 @@ RUN bun install --frozen-lockfile
 
 ARG BUN_ENV
 ARG MONGO_URI
+ARG RPC_PROVIDER
+ARG PRIVATE_KEY
 
 ENV BUN_ENV=$BUN_ENV
 ENV NODE_ENV=production
@@ -23,9 +25,12 @@ COPY --from=builder /app/dist ./dist
 COPY bun.lockb package.json ./
 RUN bun install --production --frozen-lockfile
 
-EXPOSE 3000
-ENV PORT 3000
 ENV NODE_ENV=production
+
+# GCP Cloud Run automatically sets PORT at runtime
+# The server.ts reads process.env.PORT || 8080, so it will work correctly
+# We expose 8080 as default (Cloud Run will override PORT env var)
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
