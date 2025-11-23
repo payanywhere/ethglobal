@@ -73,6 +73,30 @@ export async function getMerchantByEmail(email: string): Promise<Merchant | null
 }
 
 /**
+ * Obtiene un merchant por ID
+ */
+export async function getMerchantById(merchantId: string): Promise<Merchant | null> {
+  try {
+    // Since there is no direct endpoint, we fetch all and filter
+    // TODO: Optimize by adding a backend endpoint
+    const res = await api.get("/merchants")
+    const merchants = res.data as Merchant[]
+    return (
+      merchants.find(
+        (m) =>
+          m.merchantId === merchantId ||
+          m._id === merchantId ||
+          m.uuid === merchantId ||
+          (m as any).id === merchantId
+      ) || null
+    )
+  } catch (err: unknown) {
+    console.error("Error fetching merchant by ID:", err)
+    return null
+  }
+}
+
+/**
  * Registra un nuevo merchant
  */
 export async function registerMerchant(data: RegisterMerchantRequest): Promise<Merchant> {

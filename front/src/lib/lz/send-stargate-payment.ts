@@ -168,6 +168,7 @@ export interface SendStargatePaymentArgs {
   payInLzToken?: boolean
   composeGasLimit?: bigint
   extraOptions?: Hex
+  merchantAddress?: Address
 }
 
 function encodeAddressToBytes32(address: Address): Hex {
@@ -218,7 +219,8 @@ export async function sendStargatePayment({
   tokenReceiver: _tokenReceiver,
   payInLzToken = false,
   composeGasLimit,
-  extraOptions
+  extraOptions,
+  merchantAddress
 }: SendStargatePaymentArgs) {
   if (amountLD <= BigInt(0)) {
     throw new Error("Amount must be greater than zero")
@@ -240,13 +242,14 @@ export async function sendStargatePayment({
   }
 
   // Set refundAddress to merchant if not provided
-  const refundAddress = _refundAddress ?? DEFAULT_MERCHANT_ADDRESS
+  const targetMerchant = merchantAddress ?? DEFAULT_MERCHANT_ADDRESS
+  const refundAddress = _refundAddress ?? targetMerchant
 
   // Determine the token receiver - use provided tokenReceiver or default to merchant
   const tokenReceiver =
     _tokenReceiver && isAddress(_tokenReceiver)
       ? (_tokenReceiver as Address)
-      : DEFAULT_MERCHANT_ADDRESS
+      : targetMerchant
 
   // 1. Build compose message payload expected by Composer (address)
   // Following Hardhat example: only encode the receiver address

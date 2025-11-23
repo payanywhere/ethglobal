@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import type { Payment } from "@/services/api"
+import { getMerchantById } from "@/services/api"
 import { getPaymentsByMerchantId } from "@/services/payment"
 import type { PaymentDetails } from "../types"
 
@@ -32,6 +33,11 @@ export function usePayment(paymentId: string) {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )[0]
 
+      // Fetch merchant details to get wallets
+      console.log("Fetching merchant details for ID:", latestPayment.merchantId)
+      const merchant = await getMerchantById(latestPayment.merchantId)
+      console.log("Merchant found:", merchant ? "Yes" : "No", merchant?._id)
+
       // Map backend Payment to PaymentDetails
       const paymentDetails: PaymentDetails = {
         payment_id: latestPayment.id,
@@ -39,7 +45,8 @@ export function usePayment(paymentId: string) {
         amount_usd: latestPayment.amount,
         status: latestPayment.status as "pending" | "confirmed",
         qr_url:
-          typeof window !== "undefined" ? `${window.location.origin}/pay/${latestPayment.id}` : ""
+          typeof window !== "undefined" ? `${window.location.origin}/pay/${latestPayment.id}` : "",
+        merchant_wallets: merchant?.wallets
       }
       console.log("M:", paymentDetails)
 

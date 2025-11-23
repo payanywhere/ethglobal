@@ -59,7 +59,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
       setSelectedCashierId(cashiers[0].uuid)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, cashiers.length, cashiers[0].uuid, refreshCashiers, selectedCashierId])
+  }, [open, cashiers.length, refreshCashiers, selectedCashierId])
 
   useEffect(() => {
     if (cashiers.length > 0 && !selectedCashierId) {

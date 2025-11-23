@@ -4,6 +4,11 @@ export interface PaymentDetails {
   amount_usd: number
   status: "pending" | "confirmed"
   qr_url?: string
+  merchant_wallets?: Array<{
+    network: string
+    address: string
+    tokens: string[]
+  }>
 }
 
 export interface PaymentFormData {

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { useParams, useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { parseUnits } from "viem"
+import { type Address, parseUnits } from "viem"
 import { useAccount, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi"
 import { getChainName } from "@/constants/chains"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
@@ -207,6 +207,21 @@ export default function PaymentPage() {
       setProcessing(true)
       setError(null)
 
+      // Resolve merchant address for the payment
+      const getMerchantAddress = (chainId: number): Address | undefined => {
+        if (!payment.merchant_wallets?.length) return undefined
+        const chainName = getChainName(chainId).toLowerCase()
+        // Try match by network name
+        const wallet = payment.merchant_wallets.find((w) => w.network.toLowerCase() === chainName)
+        if (wallet?.address) return wallet.address as Address
+
+        // Fallback: return first wallet address (assuming EVM compatibility)
+        return payment.merchant_wallets[0].address as Address
+      }
+
+      const merchantAddress = getMerchantAddress(selectedToken.chain_id)
+      console.log("Resolved merchant address:", merchantAddress)
+
       // Check if we are doing a CDP Swap
       if (swapQuote) {
         console.log("Executing CDP Swap flow...")
@@ -237,7 +252,8 @@ export default function PaymentPage() {
           amountLD: amountUSDC,
           chainId: selectedToken.chain_id,
           walletClient,
-          publicClient
+          publicClient,
+          merchantAddress
           // Important: The token to send is now USDC, not selectedToken
           // sendStargatePayment infers token from chainId/config.
           // Wait, sendStargatePayment uses getOFTAddressByChainId(chainId).
@@ -279,7 +295,8 @@ export default function PaymentPage() {
           amountLD,
           chainId: selectedToken.chain_id,
           walletClient,
-          publicClient
+          publicClient,
+          merchantAddress
         })
 
         router.push(`/pay/confirmed?method=crypto&token=${selectedToken.symbol}&tx=${txHash}`)
