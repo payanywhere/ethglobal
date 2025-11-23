@@ -93,7 +93,11 @@ function isLikelySpamTransaction(item: ActivityItem): boolean {
 /**
  * Convert Dune Sim ActivityItem to Transaction format
  */
-function activityToTransaction(item: ActivityItem, walletAddress: string, index: number): Transaction | null {
+function activityToTransaction(
+  item: ActivityItem,
+  walletAddress: string,
+  index: number
+): Transaction | null {
   // Filter out spam transactions
   if (isLikelySpamTransaction(item)) {
     return null

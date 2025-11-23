@@ -33,11 +33,13 @@ export function WalletHeader({
             ) : (
               <p className="text-3xl font-heading font-bold">
                 $
-                {(isARS ? totalValueUSD * (dollarPrice ?? 0) : totalValueUSD).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
-                {" "}
+                {(isARS ? totalValueUSD * (dollarPrice ?? 0) : totalValueUSD).toLocaleString(
+                  "en-US",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  }
+                )}{" "}
                 {isARS ? "ARS" : "USD"}
               </p>
             )}

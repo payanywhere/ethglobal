@@ -1,6 +1,6 @@
-import { encodeAbiParameters, isAddress, padHex, zeroAddress, type Address, type Hex } from "viem"
-import type { PublicClient, WalletClient } from "viem"
 import { Options } from "@layerzerolabs/lz-v2-utilities"
+import type { PublicClient, WalletClient } from "viem"
+import { type Address, encodeAbiParameters, type Hex, isAddress, padHex, zeroAddress } from "viem"
 import { DESTINATION_ADDRESS, ENDPOINT_ID, getOFTAddressByChainId } from "@/constants/lz-config"
 
 const DEFAULT_MERCHANT_ADDRESS = "0xf080d5b40C370a5148a9848A869eb3Aaf7d5E146" as Address
@@ -180,13 +180,9 @@ function encodeAddressToBytes32(address: Address): Hex {
  */
 function buildComposeOptions(composeIndex: number, gasLimit: string, value: string = "0"): Hex {
   const extraOptions = Options.newOptions()
-    .addExecutorComposeOption(
-      composeIndex,
-      gasLimit,
-      value
-    )
+    .addExecutorComposeOption(composeIndex, gasLimit, value)
     .toHex()
-  
+
   return extraOptions as Hex
 }
 
@@ -247,25 +243,25 @@ export async function sendStargatePayment({
   const refundAddress = _refundAddress ?? DEFAULT_MERCHANT_ADDRESS
 
   // Determine the token receiver - use provided tokenReceiver or default to merchant
-  const tokenReceiver = _tokenReceiver && isAddress(_tokenReceiver) 
-    ? (_tokenReceiver as Address) 
-     : DEFAULT_MERCHANT_ADDRESS
+  const tokenReceiver =
+    _tokenReceiver && isAddress(_tokenReceiver)
+      ? (_tokenReceiver as Address)
+      : DEFAULT_MERCHANT_ADDRESS
 
   // 1. Build compose message payload expected by Composer (address)
   // Following Hardhat example: only encode the receiver address
-  const composeMsg = encodeAbiParameters(
-    [{ type: "address" }],
-    [tokenReceiver]
-  ) as Hex
+  const composeMsg = encodeAbiParameters([{ type: "address" }], [tokenReceiver]) as Hex
 
   // Build extraOptions for lzCompose (following Hardhat example pattern)
   // Default gas limit is 395000 (same as Hardhat example)
   const resolvedComposeGasLimit = composeGasLimit ?? BigInt(395000)
-  const resolvedExtraOptions = extraOptions ?? buildComposeOptions(
-    0, // compose index
-    resolvedComposeGasLimit.toString(),
-    "0" // no native drop
-  )
+  const resolvedExtraOptions =
+    extraOptions ??
+    buildComposeOptions(
+      0, // compose index
+      resolvedComposeGasLimit.toString(),
+      "0" // no native drop
+    )
 
   // 2. Assemble initial SendParam tuple (minAmountLD will be filled after quoteOFT)
   const to = encodeAddressToBytes32(composerAddress as Address)
@@ -288,7 +284,11 @@ export async function sendStargatePayment({
   })
 
   // quoteOFT returns [amountSentLD, amountReceivedLD, receipt]
-  const [amountSentLD, amountReceivedLD, receipt] = quoteResult as readonly [bigint, bigint, unknown]
+  const [amountSentLD, amountReceivedLD, receipt] = quoteResult as readonly [
+    bigint,
+    bigint,
+    unknown
+  ]
 
   console.log("quoteOFT result:", { amountSentLD, amountReceivedLD, receipt })
 
@@ -309,7 +309,7 @@ export async function sendStargatePayment({
 
       return undefined
     })()
-    
+
     if (fromReceipt) {
       extractedAmountReceivedLD = fromReceipt
     }
@@ -327,15 +327,15 @@ export async function sendStargatePayment({
   console.log("Extracted amountReceivedLD:", extractedAmountReceivedLD.toString())
   console.log("Original amountLD:", amountLD.toString())
 
-  // Sanity check: if extracted amount is way larger than input amount (more than 10% diff), 
+  // Sanity check: if extracted amount is way larger than input amount (more than 10% diff),
   // it's likely a unit mismatch or error. Fallback to amountLD with slippage.
   // Also apply a default 0.5% slippage tolerance
   const slippageBps = BigInt(50) // 0.5%
   const amountWithSlippage = (amountLD * (BigInt(10000) - slippageBps)) / BigInt(10000)
-  
+
   // Use the smaller of the two to avoid SlippageTooHigh revert
   let finalMinAmountLD = extractedAmountReceivedLD
-  
+
   if (extractedAmountReceivedLD > amountLD) {
     console.warn("Extracted amount > amountLD, capping at amountLD with slippage")
     finalMinAmountLD = amountWithSlippage
@@ -403,5 +403,3 @@ export async function sendStargatePayment({
   await publicClient.waitForTransactionReceipt({ hash: txHash })
   return txHash
 }
-
-

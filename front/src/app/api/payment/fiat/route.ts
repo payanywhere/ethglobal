@@ -1,5 +1,5 @@
-import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 import { type NextRequest, NextResponse } from "next/server"
+import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 
 interface FiatPaymentRequest {
   merchant_id: string
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const dollarPrice = await fetchDollarPrice();
+    const dollarPrice = await fetchDollarPrice()
 
     const preferenceBody = {
       items: [
