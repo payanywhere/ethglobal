@@ -35,6 +35,17 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return payments.map((payment) => payment.toObject() as Payment)
   }
 
+  async findAllPending(): Promise<Payment[]> {
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error("MongoDB not connected. Cannot get payments")
+    }
+
+    const payments = await PaymentModel.find({ status: "pending" })
+      .sort({ createdAt: -1 })
+      .exec()
+    return payments.map((payment) => payment.toObject() as Payment)
+  }
+
   async findByUuid(uuid: string): Promise<Payment | null> {
     if (mongoose.connection.readyState !== 1) {
       throw new Error("MongoDB not connected. Cannot get payment.")

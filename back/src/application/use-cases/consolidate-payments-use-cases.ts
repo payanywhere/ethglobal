@@ -1,9 +1,10 @@
-import type { ConsolidatorContract } from "../../infrastructure/blockchain/consolidator-contract"
+import type { Payment } from "../../domain/entities/payment"
+import type { PaymentRepository } from "../../domain/repositories/payment-repository"
 
 export class ConsolidatePaymentsUseCase {
-  constructor(private consolidator: ConsolidatorContract) {}
+  constructor(private paymentRepository: PaymentRepository) {}
 
-  async getPending(): Promise<number> {
-    return this.consolidator.getPendingPayments()
+  async getPending(): Promise<Payment[]> {
+    return this.paymentRepository.findAllPending()
   }
 }
