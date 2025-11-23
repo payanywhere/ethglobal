@@ -4,13 +4,13 @@ import { motion } from "framer-motion"
 import { useParams, useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { useAccount, useDisconnect } from "wagmi"
-import { calculateTokenAmount } from "@/services/dune-sim"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
+import { calculateTokenAmount } from "@/services/dune-sim"
 import { CryptoPaymentCard } from "./components/crypto-payment-card"
 import { ErrorMessage } from "./components/error-message"
 import { FiatPaymentCard } from "./components/fiat-payment-card"
-import { PaymentHeader } from "./components/payment-header"
 import { PaymentAmount } from "./components/payment-amount"
+import { PaymentHeader } from "./components/payment-header"
 import { PaymentInfoBanner } from "./components/payment-info-banner"
 import { PaymentStatus } from "./components/payment-status"
 import { ANIMATION_VARIANTS } from "./constants"
@@ -45,7 +45,7 @@ export default function PaymentPage() {
 
   // Memoize callbacks
   const handleTokenSelect = useCallback(
-    (token: typeof balances[0]) => {
+    (token: (typeof balances)[0]) => {
       setSelectedToken(token)
     },
     [setSelectedToken]
@@ -148,7 +148,7 @@ export default function PaymentPage() {
           <PaymentAmount
             amount={payment.amount_usd}
             paymentId={payment.payment_id}
-              variants={itemVariants}
+            variants={itemVariants}
           />
 
           <ErrorMessage error={displayError} />

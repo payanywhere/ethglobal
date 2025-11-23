@@ -12,4 +12,3 @@ export interface PaymentFormData {
   description: string
   email?: string
 }
-

@@ -47,4 +47,3 @@ export function usePayment(paymentId: string) {
     refetch: fetchPayment
   }
 }
-

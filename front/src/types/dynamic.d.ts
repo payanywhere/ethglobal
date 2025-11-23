@@ -56,11 +56,10 @@ declare module "@dynamic-labs/sdk-react-core" {
     setShowAuthFlow: (open: boolean) => void
     setShowLinkNewWalletModal: (open: boolean) => void
   }
-  
+
   export function useIsLoggedIn(): boolean
 }
 
 declare module "@dynamic-labs/ethereum" {
   export const EthereumWalletConnectors: unknown
 }
-

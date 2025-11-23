@@ -138,20 +138,14 @@ export function getTokensForNetwork(network: "ethereum" | "base"): TokenInfo[] {
 /**
  * Get token info by address and network
  */
-export function getTokenInfo(
-  address: string,
-  network: "ethereum" | "base"
-): TokenInfo | undefined {
+export function getTokenInfo(address: string, network: "ethereum" | "base"): TokenInfo | undefined {
   const tokens = getTokensForNetwork(network)
-  return tokens.find(
-    (token) => token.address.toLowerCase() === address.toLowerCase()
-  )
+  return tokens.find((token) => token.address.toLowerCase() === address.toLowerCase())
 }
 
 /**
  * Get native token address for a network
  */
-export function getNativeTokenAddress(network: "ethereum" | "base"): string {
+export function getNativeTokenAddress(_network: "ethereum" | "base"): string {
   return "0x0000000000000000000000000000000000000000"
 }
-

@@ -9,4 +9,3 @@ export { PaymentStatus } from "./payment-status"
 export { TokenList } from "./token-list"
 export { TokenOption } from "./token-option"
 export { WalletInfo } from "./wallet-info"
-

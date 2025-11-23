@@ -159,4 +159,3 @@ export function getChainName(chainId: number): string {
   }
   return chains[chainId] || `Chain ${chainId}`
 }
-

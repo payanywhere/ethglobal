@@ -135,8 +135,8 @@ export async function searchTokenBySymbol(
   chainId: number,
   symbol: string
 ): Promise<DeFiLlamaPrice | null> {
-  const chain = getChainPrefix(chainId)
-  
+  const _chain = getChainPrefix(chainId)
+
   // Try common stablecoin addresses first
   const commonTokens: Record<string, Record<number, string>> = {
     USDT: {
@@ -164,15 +164,15 @@ export async function searchTokenBySymbol(
       137: "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063"
     }
   }
-  
+
   const upperSymbol = symbol.toUpperCase()
   const tokenAddress = commonTokens[upperSymbol]?.[chainId]
-  
+
   if (tokenAddress) {
     console.log(`Found common token ${upperSymbol} on chain ${chainId}: ${tokenAddress}`)
     return await fetchTokenPrice(chainId, tokenAddress)
   }
-  
+
   console.warn(`No common token mapping found for ${symbol} on chain ${chainId}`)
   return null
 }
@@ -180,11 +180,7 @@ export async function searchTokenBySymbol(
 /**
  * Calculate USD value from token amount and price
  */
-export function calculateUsdValue(
-  amount: string,
-  decimals: number,
-  priceUsd: number
-): number {
+export function calculateUsdValue(amount: string, decimals: number, priceUsd: number): number {
   try {
     const amountBigInt = BigInt(amount)
     const divisor = BigInt(10 ** decimals)
@@ -195,4 +191,3 @@ export function calculateUsdValue(
     return 0
   }
 }
-

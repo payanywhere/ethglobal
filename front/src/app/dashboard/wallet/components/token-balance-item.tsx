@@ -26,7 +26,9 @@ export const TokenBalanceItem = memo(function TokenBalanceItem({ token }: TokenB
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-foreground/20 to-foreground/10 flex items-center justify-center">
-              <span className="text-base font-bold text-foreground/70">{token.symbol.slice(0, 2)}</span>
+              <span className="text-base font-bold text-foreground/70">
+                {token.symbol.slice(0, 2)}
+              </span>
             </div>
           )}
         </div>
@@ -50,7 +52,11 @@ export const TokenBalanceItem = memo(function TokenBalanceItem({ token }: TokenB
             <div className="text-right flex-shrink-0">
               <p className="font-heading font-semibold text-base mb-1">{formattedAmount}</p>
               <p className="text-sm font-medium text-foreground/60">
-                ${valueUSD.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                $
+                {valueUSD.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
               </p>
             </div>
           </div>
@@ -59,4 +65,3 @@ export const TokenBalanceItem = memo(function TokenBalanceItem({ token }: TokenB
     </div>
   )
 })
-

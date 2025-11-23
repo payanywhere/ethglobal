@@ -2,7 +2,7 @@
 
 import { CheckCircle2, Clock, ExternalLink, Loader2, Plus } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, memo, useCallback, useEffect, useMemo, useState } from "react"
+import { memo, Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -271,11 +271,13 @@ function PaymentsPageContent() {
 
 export default function PaymentsPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-foreground/50" />
+        </div>
+      }
+    >
       <PaymentsPageContent />
     </Suspense>
   )

@@ -60,4 +60,3 @@ export function PaymentStatus({ status }: PaymentStatusProps) {
     </main>
   )
 }
-

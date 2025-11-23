@@ -190,4 +190,3 @@ export function getDefiSupportedChainIds(): number[] {
 export function getAllChainIds(): number[] {
   return ALL_CHAINS.map((chain) => chain.chain_id)
 }
-

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { fetchWalletActivity, type ActivityItem } from "@/services/dune-sim-activity"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
+import { type ActivityItem, fetchWalletActivity } from "@/services/dune-sim-activity"
 
 export interface Transaction {
   hash: string
@@ -34,7 +34,7 @@ function isLikelySpamToken(symbol: string, name: string): boolean {
     /[\u1E00-\u1EFF]/, // Latin Extended Additional
     /[\uFF00-\uFFEF]/, // Fullwidth forms
     /visit|claim|reward|bonus|airdrop|free|gift/i, // Common spam words
-    /\$|💰|🎁|🚀|⚡/  // Common spam emojis
+    /\$|💰|🎁|🚀|⚡/ // Common spam emojis
   ]
 
   return spamPatterns.some((pattern) => pattern.test(textToCheck))
@@ -108,7 +108,8 @@ function activityToTransaction(item: ActivityItem, walletAddress: string): Trans
   }
 
   const timestamp = Math.floor(new Date(item.block_time).getTime() / 1000) // Convert to seconds
-  const isReceive = item.type === "receive" || item.to?.toLowerCase() === walletAddress.toLowerCase()
+  const isReceive =
+    item.type === "receive" || item.to?.toLowerCase() === walletAddress.toLowerCase()
   const type = isReceive ? "receive" : "send"
 
   // Determine decimals - use metadata if available, otherwise default to 18 for ERC20
@@ -199,4 +200,3 @@ export function useWalletTransactions(address: string | null) {
     refetch: loadTransactions
   }
 }
-

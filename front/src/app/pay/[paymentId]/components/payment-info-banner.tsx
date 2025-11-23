@@ -1,6 +1,6 @@
+import type { Variants } from "framer-motion"
 import { motion } from "framer-motion"
 import { Sparkles } from "lucide-react"
-import type { Variants } from "framer-motion"
 
 interface PaymentInfoBannerProps {
   variants?: Variants
@@ -30,4 +30,3 @@ export function PaymentInfoBanner({ variants }: PaymentInfoBannerProps) {
     </motion.div>
   )
 }
-

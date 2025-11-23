@@ -26,4 +26,3 @@ export function ErrorMessage({ error }: ErrorMessageProps) {
     </AnimatePresence>
   )
 }
-
