@@ -14,8 +14,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { MerchantProvider, useMerchant } from "@/contexts/merchant-context"
-import { useMerchantVerification } from "@/hooks/use-merchant-verification"
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +29,8 @@ import {
   SidebarRail,
   SidebarTrigger
 } from "@/components/ui/sidebar"
+import { MerchantProvider, useMerchant } from "@/contexts/merchant-context"
+import { useMerchantVerification } from "@/hooks/use-merchant-verification"
 
 const menuItems = [
   {
@@ -161,11 +161,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 }
 
 function MerchantVerificationWrapper({ children }: { children: React.ReactNode }) {
-  const {
-    isVerifying,
-    merchantVerified,
-    error: merchantError
-  } = useMerchantVerification()
+  const { isVerifying, error: merchantError } = useMerchantVerification()
 
   // Show loading while verifying merchant
   if (isVerifying) {

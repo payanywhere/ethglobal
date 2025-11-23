@@ -13,10 +13,10 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
 import { useMerchantVerification } from "@/hooks/use-merchant-verification"
-import { PaymentFormOverlay } from "./payment-form-overlay"
+import { cn } from "@/lib/utils"
 import type { Payment } from "@/services/api"
+import { PaymentFormOverlay } from "./payment-form-overlay"
 
 interface PaymentRecord {
   id: string
@@ -32,7 +32,7 @@ interface PaymentRecord {
 const StatusBadge = memo(({ status }: { status: PaymentRecord["status"] }) => {
   const isConsolidated = status === "consolidated"
   const isFailed = status === "failed"
-  const isPending = status === "pending"
+  // const isPending = status === "pending"
 
   return (
     <span
@@ -87,26 +87,19 @@ const PaymentRow = memo(({ payment }: { payment: PaymentRecord }) => {
 
   return (
     <TableRow className="bg-background hover:bg-secondary-background border-b border-border">
-      <TableCell className="font-medium text-foreground font-mono text-sm">
-        {payment.id}
-      </TableCell>
+      <TableCell className="font-medium text-foreground font-mono text-sm">{payment.id}</TableCell>
       <TableCell className="text-foreground">${payment.amount_usd.toFixed(2)}</TableCell>
       <TableCell className="text-foreground">
         <StatusBadge status={payment.status} />
       </TableCell>
-      <TableCell className="text-foreground text-sm">
-
-      {formatDate(payment.createdAt)}
-      </TableCell>
+      <TableCell className="text-foreground text-sm">{formatDate(payment.createdAt)}</TableCell>
 
       <TableCell className="text-foreground text-sm">
-      
-          <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
-            <ExternalLink className="h-3 w-3" />
-            View
-          </Button>
+        <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
+          <ExternalLink className="h-3 w-3" />
+          View
+        </Button>
       </TableCell>
-
     </TableRow>
   )
 })
@@ -137,7 +130,7 @@ function PaymentsPageContent() {
         status: p.status,
         createdAt: p.createdAt,
         merchant_id: p.merchantId,
-        amount_usd: p.amount,
+        amount_usd: p.amount
       }))
       setPayments(convertedPayments)
       setLoading(false)
@@ -149,7 +142,7 @@ function PaymentsPageContent() {
     }
   }, [paymentsFromHook, walletAddress, isVerifying])
 
-  // Memoized merchant ID 
+  // Memoized merchant ID
   const merchantId = useMemo(() => "merchant01", [])
 
   // Handle form close

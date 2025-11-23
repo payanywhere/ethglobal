@@ -38,7 +38,13 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   onSuccess,
   merchantId
 }: PaymentFormOverlayProps) {
-  const { walletAddress, cashiers, refreshCashiers, isLoading: isLoadingContext, merchant } = useMerchant()
+  const {
+    walletAddress,
+    cashiers,
+    refreshCashiers,
+    isLoading: isLoadingContext,
+    merchant
+  } = useMerchant()
   const [amount, setAmount] = useState<number>(10)
   const [description, setDescription] = useState<string>("")
   const [email, setEmail] = useState<string>("")
@@ -58,7 +64,9 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   useEffect(() => {
     if (!open) return
     if (!walletAddress) {
-      console.warn("[PaymentFormOverlay] ⚠️ No hay walletAddress disponible cuando se abrió el diálogo")
+      console.warn(
+        "[PaymentFormOverlay] ⚠️ No hay walletAddress disponible cuando se abrió el diálogo"
+      )
       setError("Dirección de wallet no disponible. Por favor, verifica tu conexión.")
       return
     }
@@ -134,7 +142,6 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
         // to not block the user experience
       }
 
-      // mpago
       const res = await fetch("/api/payment/fiat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -226,8 +233,9 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor      // Crear pago de Mercado Pago
-
+              <Label htmlFor="description" className="text-base font-heading">
+                Description (Optional)
+              </Label>
               <Input
                 id="description"
                 type="text"
@@ -239,8 +247,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
               <p className="text-sm text-foreground/50 font-base">
                 Add a description for this payment
               </p>
-      // Crear pago de Mercado Pago
-      </div>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-base font-heading">
@@ -258,6 +265,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
                 Customer email address for notifications
               </p>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="cashier" className="text-base font-heading">
                 Cashier

@@ -2,18 +2,18 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import { useEffect, useRef, useState } from "react"
+import { useMerchant } from "@/contexts/merchant-context"
 import {
   createCashier,
   getCashiersByMerchantAddress,
   getMerchantByAddress,
   getMerchantByEmail,
   getPaymentsByMerchantAddress,
-  registerMerchant,
   type Merchant,
   type Payment,
-  type RegisterMerchantRequest
+  type RegisterMerchantRequest,
+  registerMerchant
 } from "@/services/api"
-import { useMerchant } from "@/contexts/merchant-context"
 
 interface UseMerchantVerificationResult {
   isVerifying: boolean
@@ -66,10 +66,9 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
       return
     }
 
-
     if (!currentAddress) {
       console.log("no wallet")
-      return 
+      return
     }
 
     if (hasVerifiedRef.current) {
@@ -102,10 +101,10 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
             try {
               const cashiers = await getCashiersByMerchantAddress(currentAddress)
               console.log("cashiers found", cashiers.length)
-              
+
               // Update the context with the cashiers
               merchantContext.setCashiers(cashiers)
-              
+
               if (cashiers.length === 0) {
                 await createCashier({
                   merchantId: existingMerchant._id,
@@ -153,7 +152,7 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
                     })
                     const refreshedCashiers = await getCashiersByMerchantAddress(currentAddress)
                     merchantContext.setCashiers(refreshedCashiers)
-                  } 
+                  }
 
                   const merchantPayments = await getPaymentsByMerchantAddress(currentAddress)
                   setPayments(merchantPayments)
@@ -196,7 +195,7 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
         } catch (err) {
           console.error("error", err)
         }
-        
+
         setMerchantVerified(true)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error verifying merchant")
@@ -222,7 +221,7 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
       merchantContext.setPayments([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]) 
+  }, [isAuthenticated])
 
   return {
     isVerifying,
@@ -232,4 +231,3 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
     payments
   }
 }
-
