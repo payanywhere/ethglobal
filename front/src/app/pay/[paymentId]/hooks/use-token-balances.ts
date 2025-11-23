@@ -51,16 +51,33 @@ export function useTokenBalances(payment: PaymentDetails | null) {
         limit: 100
       })
 
-      const sufficientBalances = filterTokensWithSufficientBalance(
-        response.balances,
-        payment.amount_usd
+      // Filter out tokens with zero value, but show all tokens regardless of whether
+      // they cover the full payment amount (user might want to see what they have)
+      let availableTokens = response.balances.filter(
+        (token) => (token.value_usd || 0) > 0
       )
+      
+      // Prioritize Base (8453) and Ethereum (1) tokens
+      availableTokens.sort((a, b) => {
+        const isABaseOrEth = a.chain_id === 8453 || a.chain_id === 1
+        const isBBaseOrEth = b.chain_id === 8453 || b.chain_id === 1
+        
+        if (isABaseOrEth && !isBBaseOrEth) return -1
+        if (!isABaseOrEth && isBBaseOrEth) return 1
+        
+        // Secondary sort by value (desc)
+        return (b.value_usd || 0) - (a.value_usd || 0)
+      })
 
-      setBalances(sufficientBalances)
+      setBalances(availableTokens)
 
-      // Only auto-select if no token is currently selected
-      if (sufficientBalances.length > 0 && !selectedTokenRef.current) {
-        setSelectedToken(sufficientBalances[0])
+      // Only auto-select if no token is currently selected and we have tokens
+      if (availableTokens.length > 0 && !selectedTokenRef.current) {
+        // Prefer tokens that have sufficient balance
+        const sufficientToken = availableTokens.find(
+          (t) => (t.value_usd || 0) >= payment.amount_usd
+        )
+        setSelectedToken(sufficientToken || availableTokens[0])
       }
     } catch (err) {
       console.error("Error loading balances:", err)

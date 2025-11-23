@@ -46,8 +46,8 @@ export function TokenList({
   }
 
   return (
-    <div className="space-y-2 max-h-48 overflow-y-auto">
-      {tokens.slice(0, 3).map((token) => {
+    <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+      {tokens.map((token) => {
         const { formattedAmount } = calculateTokenAmount(token, paymentAmount)
         const isSelected = selectedToken?.address === token.address
 

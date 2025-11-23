@@ -22,6 +22,8 @@ interface CryptoPaymentCardProps {
   onRefreshBalances: () => void
   onDisconnect: () => void
   variants?: Variants
+  swapQuoteAmount?: string | null
+  isQuoting?: boolean
 }
 
 export function CryptoPaymentCard({
@@ -37,7 +39,9 @@ export function CryptoPaymentCard({
   onPay,
   onRefreshBalances,
   onDisconnect,
-  variants
+  variants,
+  swapQuoteAmount,
+  isQuoting
 }: CryptoPaymentCardProps) {
   return (
     <motion.div variants={variants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -81,10 +85,19 @@ export function CryptoPaymentCard({
                 onRefresh={onRefreshBalances}
               />
 
+              {swapQuoteAmount && (
+                <div className="p-3 rounded-base bg-secondary-background border border-border text-sm">
+                  <p className="font-medium text-foreground/80">Swap Quote</p>
+                  <p className="text-foreground/60">
+                    Pay <span className="font-bold text-foreground">{swapQuoteAmount} {selectedToken?.symbol}</span> (includes fees)
+                  </p>
+                </div>
+              )}
+
               {tokens.length > 0 && (
                 <Button
                   onClick={onPay}
-                  disabled={!selectedToken || processing}
+                  disabled={!selectedToken || processing || isQuoting}
                   variant="default"
                   size="lg"
                   className="w-full min-h-14 text-lg font-heading bg-chart-1 hover:bg-chart-1/90"
@@ -93,6 +106,11 @@ export function CryptoPaymentCard({
                     <>
                       <Loader2 className="animate-spin w-5 h-5" />
                       Processing...
+                    </>
+                  ) : isQuoting ? (
+                    <>
+                      <Loader2 className="animate-spin w-5 h-5" />
+                      Getting Quote...
                     </>
                   ) : (
                     <>

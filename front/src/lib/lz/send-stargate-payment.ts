@@ -3,7 +3,7 @@ import type { PublicClient, WalletClient } from "viem"
 import { type Address, encodeAbiParameters, type Hex, isAddress, padHex, zeroAddress } from "viem"
 import { DESTINATION_ADDRESS, ENDPOINT_ID, getOFTAddressByChainId } from "@/constants/lz-config"
 
-const DEFAULT_MERCHANT_ADDRESS = "0xf080d5b40C370a5148a9848A869eb3Aaf7d5E146" as Address
+export const DEFAULT_MERCHANT_ADDRESS = "0xf080d5b40C370a5148a9848A869eb3Aaf7d5E146" as Address
 
 const STARGATE_POOL_ABI = [
   {
@@ -382,7 +382,7 @@ export async function sendStargatePayment({
         functionName: "approve",
         args: [srcOftAddress as Address, amountLD],
         account,
-        chain: walletClient.chain
+        chain: null
       })
 
       await publicClient.waitForTransactionReceipt({ hash: approvalHash })
@@ -396,8 +396,8 @@ export async function sendStargatePayment({
     functionName: "send",
     args: [sendParam, messagingFee, refundAddress],
     account,
-    chain: walletClient.chain,
-    value: valueToSend
+    value: valueToSend,
+    chain: null
   })
 
   await publicClient.waitForTransactionReceipt({ hash: txHash })
