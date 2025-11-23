@@ -63,8 +63,12 @@ export function useWalletBalances(address: string | null) {
       map.set(`${chainId}-${token.address.toLowerCase()}`, token)
     }
 
-    ETHEREUM_TOKENS.forEach((token) => register(1, token))
-    BASE_TOKENS.forEach((token) => register(8453, token))
+    ETHEREUM_TOKENS.forEach((token) => {
+      register(1, token)
+    })
+    BASE_TOKENS.forEach((token) => {
+      register(8453, token)
+    })
 
     return map
   }, [])

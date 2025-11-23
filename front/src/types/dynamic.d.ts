@@ -46,8 +46,8 @@ declare module "@dynamic-labs/sdk-react-core" {
         value?: string
         gas?: string
       }) => Promise<string>
-      getWalletClient?: () => Promise<any>
-      getPublicClient?: () => Promise<any>
+      getWalletClient?: () => Promise<unknown>
+      getPublicClient?: () => Promise<unknown>
     } | null
     isAuthenticated: boolean
     isAuthLoading: boolean
