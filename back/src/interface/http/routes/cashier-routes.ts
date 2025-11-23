@@ -1,9 +1,9 @@
 import { Router } from "express"
 import {
-  getCashiers,
   createCashier,
   getCashierByUuid,
   getCashierDetails,
+  getCashiers,
   getCashiersByMerchant,
   getCashiersByMerchantAddress
 } from "../controllers/cashier-controller"

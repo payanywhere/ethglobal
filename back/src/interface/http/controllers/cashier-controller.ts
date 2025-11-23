@@ -4,15 +4,18 @@ import {
   getAllCashiersUseCase,
   getCashierByUuidUseCase,
   getCashierDetailsUseCase,
-  getCashiersByMerchantUseCase,
-  getCashiersByMerchantAddressUseCase
+  getCashiersByMerchantAddressUseCase,
+  getCashiersByMerchantUseCase
 } from "../../../factories/use-case-factory"
 
 interface ErrorResponse {
   error: string
 }
 
-export async function getCashiers(req: Request, res: Response<ErrorResponse | unknown>): Promise<void> {
+export async function getCashiers(
+  _req: Request,
+  res: Response<ErrorResponse | unknown>
+): Promise<void> {
   try {
     const useCase = getAllCashiersUseCase()
     const cashiers = await useCase.execute()

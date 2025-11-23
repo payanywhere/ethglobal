@@ -31,6 +31,7 @@ export interface RegisterMerchantRequest {
 
 export interface Merchant {
   _id?: string
+  id?: string
   uuid?: string
   merchantId?: string
   email: string
@@ -87,7 +88,7 @@ export async function getMerchantById(merchantId: string): Promise<Merchant | nu
           m.merchantId === merchantId ||
           m._id === merchantId ||
           m.uuid === merchantId ||
-          (m as any).id === merchantId
+          m.id === merchantId
       ) || null
     )
   } catch (err: unknown) {

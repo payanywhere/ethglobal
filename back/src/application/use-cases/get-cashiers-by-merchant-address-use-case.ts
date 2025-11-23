@@ -25,4 +25,3 @@ export class GetCashiersByMerchantAddressUseCase {
     return await this.cashierRepository.findByMerchantId(merchantId)
   }
 }
-

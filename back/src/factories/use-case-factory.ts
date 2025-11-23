@@ -4,8 +4,8 @@ import { CreatePaymentUseCase } from "../application/use-cases/create-payment-us
 import { GetAllCashiersUseCase } from "../application/use-cases/get-all-cashiers-use-case"
 import { GetCashierByUuidUseCase } from "../application/use-cases/get-cashier-by-uuid-use-case"
 import { GetCashierDetailsUseCase } from "../application/use-cases/get-cashier-details-use-case"
-import { GetCashiersByMerchantUseCase } from "../application/use-cases/get-cashiers-by-merchant-use-case"
 import { GetCashiersByMerchantAddressUseCase } from "../application/use-cases/get-cashiers-by-merchant-address-use-case"
+import { GetCashiersByMerchantUseCase } from "../application/use-cases/get-cashiers-by-merchant-use-case"
 import { GetMerchantByAddressUseCase } from "../application/use-cases/get-merchant-by-address-use-case"
 import { GetMerchantByEmailUseCase } from "../application/use-cases/get-merchant-by-email-use-case"
 import { GetMerchantsUseCase } from "../application/use-cases/get-merchants-use-case"
@@ -23,7 +23,7 @@ import { PaymentRepositoryImpl } from "../infrastructure/repositories/payment-re
 const paymentRepository = new PaymentRepositoryImpl()
 const merchantRepository = new MerchantRepositoryImpl()
 const cashierRepository = new CashierRepositoryImpl()
-const consolidatorContract = new ConsolidatorContract()
+const _consolidatorContract = new ConsolidatorContract()
 
 // Payment use cases
 export function createPaymentUseCase(): CreatePaymentUseCase {

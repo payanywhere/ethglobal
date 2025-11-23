@@ -2,8 +2,8 @@ import type { Request, Response } from "express"
 import {
   getMerchantByAddressUseCase,
   getMerchantByEmailUseCase,
-  registerMerchantUseCase,
-  getMerchantsUseCase
+  getMerchantsUseCase,
+  registerMerchantUseCase
 } from "../../../factories/use-case-factory"
 
 interface ErrorResponse {
@@ -71,7 +71,7 @@ export async function getMerchantByAddress(
 }
 
 export async function getMerchants(
-  req: Request,
+  _req: Request,
   res: Response<ErrorResponse | unknown>
 ): Promise<void> {
   try {

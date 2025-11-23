@@ -55,11 +55,9 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
       refreshCashiers().catch((_err) => {
         setError("error loading cashiers")
       })
-    } else if (!selectedCashierId) {
-      setSelectedCashierId(cashiers[0].uuid)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, cashiers.length, refreshCashiers, selectedCashierId])
+  }, [open, cashiers.length, refreshCashiers])
 
   useEffect(() => {
     if (cashiers.length > 0 && !selectedCashierId) {

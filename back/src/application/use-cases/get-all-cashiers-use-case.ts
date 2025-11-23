@@ -8,4 +8,3 @@ export class GetAllCashiersUseCase {
     return await this.cashierRepository.getAll()
   }
 }
-

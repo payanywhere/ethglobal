@@ -2,8 +2,8 @@ import { Router } from "express"
 import {
   getMerchantByAddress,
   getMerchantByEmail,
-  registerMerchant,
-  getMerchants
+  getMerchants,
+  registerMerchant
 } from "../controllers/merchant-controller"
 
 const router = Router()

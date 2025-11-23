@@ -25,4 +25,3 @@ export class GetPaymentsByMerchantAddressUseCase {
     return await this.paymentRepository.findByMerchant(merchantId)
   }
 }
-
