@@ -1,6 +1,7 @@
 "use client"
 
 import { Check, Copy, ExternalLink } from "lucide-react"
+import Image from "next/image"
 import QRCode from "qrcode"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -71,7 +72,13 @@ export function ReceiveOverlay({ open, onOpenChange, address }: ReceiveOverlayPr
           <div className="flex justify-center">
             {qrCodeDataUrl ? (
               <div className="p-4 rounded-base border-2 border-border bg-white">
-                <img src={qrCodeDataUrl} alt="Wallet QR Code" className="w-64 h-64" />
+                <Image
+                  src={qrCodeDataUrl}
+                  alt="Wallet QR Code"
+                  width={256}
+                  height={256}
+                  className="w-64 h-64"
+                />
               </div>
             ) : (
               <div className="w-64 h-64 rounded-base border-2 border-border bg-foreground/10 animate-pulse flex items-center justify-center">

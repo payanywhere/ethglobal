@@ -308,7 +308,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
       }
 
       // Verify we can connect to the wallet client before getting quote
-      let walletClient
+      let walletClient:
+        | Awaited<ReturnType<NonNullable<typeof primaryWallet.getWalletClient>>>
+        | undefined
+
       try {
         walletClient = await primaryWallet.getWalletClient?.()
         if (!walletClient) {
@@ -337,10 +340,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
         permit2?: {
           hash: string
           eip712: {
-            domain: any
-            types: any
+            domain: Record<string, unknown>
+            types: Record<string, unknown>
             primaryType: string
-            message: any
+            message: Record<string, unknown>
           }
         }
       }
@@ -391,6 +394,25 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           setApprovingToken(true)
 
           const publicClient = await primaryWallet.getPublicClient?.()
+          if (!publicClient) {
+            throw new Error("Unable to get public client")
+          }
+
+          // Type assertion for Viem public client
+          type PublicClient = {
+            readContract: (params: {
+              address: `0x${string}`
+              abi: readonly unknown[]
+              functionName: string
+              args: [`0x${string}`, `0x${string}`]
+            }) => Promise<bigint>
+            waitForTransactionReceipt: (params: {
+              hash: `0x${string}`
+              timeout: number
+            }) => Promise<{ status: "success" | "reverted" }>
+          }
+
+          const viemPublicClient = publicClient as PublicClient
 
           // ERC20 allowance ABI
           const allowanceAbi = [
@@ -407,7 +429,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           ] as const
 
           // Check current allowance for Permit2 contract
-          const currentAllowance = await publicClient.readContract({
+          const currentAllowance = await viemPublicClient.readContract({
             address: fromTokenAddress as `0x${string}`,
             abi: allowanceAbi,
             functionName: "allowance",
@@ -440,7 +462,34 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
               `Approving Permit2 contract (${PERMIT2_ADDRESS}) for ${fromAmount.toString()} tokens`
             )
 
-            const approvalHash = await walletClient.writeContract({
+            // Type assertion for Viem wallet client
+            type WalletClient = {
+              writeContract: (params: {
+                address: `0x${string}`
+                abi: readonly unknown[]
+                functionName: string
+                args: [`0x${string}`, bigint]
+                account: `0x${string}`
+              }) => Promise<`0x${string}`>
+              signTypedData: (params: {
+                account: `0x${string}`
+                domain: Record<string, unknown>
+                types: Record<string, unknown>
+                primaryType: string
+                message: Record<string, unknown>
+              }) => Promise<`0x${string}`>
+              sendTransaction: (params: {
+                account: `0x${string}`
+                to: `0x${string}`
+                data: `0x${string}`
+                value: bigint
+                gas?: bigint
+              }) => Promise<`0x${string}`>
+            }
+
+            const viemWalletClient = walletClient as WalletClient
+
+            const approvalHash = await viemWalletClient.writeContract({
               address: fromTokenAddress as `0x${string}`,
               abi: approveAbi,
               functionName: "approve",
@@ -452,7 +501,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
             // Wait for approval transaction to be confirmed
             console.log("Waiting for approval confirmation...")
-            const approvalReceipt = await publicClient.waitForTransactionReceipt({
+            const approvalReceipt = await viemPublicClient.waitForTransactionReceipt({
               hash: approvalHash,
               timeout: 60_000
             })
@@ -486,7 +535,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
       // Send transaction using Dynamic wallet
       // Using Dynamic's recommended Viem integration approach
-      let txHash: string
+      let txHash: `0x${string}`
 
       try {
         console.log("Getting wallet clients for transaction...")
@@ -506,13 +555,33 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           console.log("Signing Permit2 EIP-712 message...")
 
           try {
+            // Type assertion for Viem wallet client (already defined above, but need to re-assert)
+            type WalletClient = {
+              signTypedData: (params: {
+                account: `0x${string}`
+                domain: Record<string, unknown>
+                types: Record<string, unknown>
+                primaryType: string
+                message: Record<string, unknown>
+              }) => Promise<`0x${string}`>
+              sendTransaction: (params: {
+                account: `0x${string}`
+                to: `0x${string}`
+                data: `0x${string}`
+                value: bigint
+                gas?: bigint
+              }) => Promise<`0x${string}`>
+            }
+
+            const viemWalletClient = walletClient as WalletClient
+
             // Sign the Permit2 typed data
-            const permit2Signature = await walletClient.signTypedData({
+            const permit2Signature = await viemWalletClient.signTypedData({
               account: primaryWallet.address as `0x${string}`,
-              domain: txData.permit2.eip712.domain as any,
-              types: txData.permit2.eip712.types as any,
-              primaryType: txData.permit2.eip712.primaryType as string,
-              message: txData.permit2.eip712.message as any
+              domain: txData.permit2.eip712.domain as Record<string, unknown>,
+              types: txData.permit2.eip712.types as Record<string, unknown>,
+              primaryType: txData.permit2.eip712.primaryType,
+              message: txData.permit2.eip712.message as Record<string, unknown>
             })
 
             console.log("Permit2 signature obtained:", `${permit2Signature.substring(0, 20)}...`)
@@ -557,9 +626,22 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           dataLength: txParams.data.length
         })
 
+        // Type assertion for Viem wallet client
+        type WalletClient = {
+          sendTransaction: (params: {
+            account: `0x${string}`
+            to: `0x${string}`
+            data: `0x${string}`
+            value: bigint
+            gas?: bigint
+          }) => Promise<`0x${string}`>
+        }
+
+        const viemWalletClient = walletClient as WalletClient
+
         // Send transaction using Viem's sendTransaction
         // This works universally for all wallet types (embedded, external, etc.)
-        txHash = await walletClient.sendTransaction(txParams)
+        txHash = await viemWalletClient.sendTransaction(txParams)
 
         console.log("Transaction sent successfully, hash:", txHash)
 
@@ -567,8 +649,15 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
         try {
           const publicClient = await primaryWallet.getPublicClient?.()
           if (publicClient) {
+            type PublicClient = {
+              waitForTransactionReceipt: (params: {
+                hash: `0x${string}`
+                timeout: number
+              }) => Promise<{ status: "success" | "reverted" }>
+            }
+            const viemPublicClient = publicClient as PublicClient
             console.log("Waiting for transaction confirmation...")
-            const receipt = await publicClient.waitForTransactionReceipt({
+            const receipt = await viemPublicClient.waitForTransactionReceipt({
               hash: txHash,
               timeout: 60_000 // 60 seconds timeout
             })
@@ -693,8 +782,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
     primaryWallet?.address,
     onSuccess,
     availableToTokens,
-    primaryWallet.connector.switchNetwork,
-    primaryWallet.getPublicClient,
+    primaryWallet?.connector?.switchNetwork,
     primaryWallet
   ])
 
@@ -772,7 +860,17 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 px-6 pb-6 pt-2" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="space-y-6 px-6 pb-6 pt-2"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.stopPropagation()
+            }
+          }}
+          role="dialog"
+          aria-modal="true"
+        >
           {success ? (
             <div className="space-y-4 text-center py-8">
               <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mx-auto">
@@ -859,6 +957,12 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       <div
                         className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") {
+                            e.stopPropagation()
+                          }
+                        }}
+                        role="listbox"
                       >
                         <div className="p-2 space-y-1">
                           {availableFromTokens.map((token) => {
@@ -1003,6 +1107,12 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       <div
                         className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") {
+                            e.stopPropagation()
+                          }
+                        }}
+                        role="listbox"
                       >
                         <div className="p-2 space-y-1">
                           {filteredToTokens.map((token) => {

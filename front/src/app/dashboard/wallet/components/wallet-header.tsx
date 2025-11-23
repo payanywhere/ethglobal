@@ -15,7 +15,7 @@ interface WalletHeaderProps {
 export function WalletHeader({
   totalValueUSD,
   loading,
-  dollarPrice,
+  dollarPrice: _dollarPrice,
   onSend,
   onReceive,
   onSwap

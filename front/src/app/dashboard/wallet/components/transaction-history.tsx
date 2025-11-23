@@ -15,7 +15,7 @@ export function TransactionHistory({
   transactions,
   loading,
   error,
-  address
+  address: _address
 }: TransactionHistoryProps) {
   const viewOnExplorer = (hash: string, chainId: number) => {
     // Complete chain mapping with all major networks
