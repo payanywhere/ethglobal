@@ -136,7 +136,7 @@ export function TransactionHistory({
 
             return (
               <div
-                key={tx.hash}
+                key={tx.id}
                 className="flex items-center gap-4 p-4 rounded-base border border-border bg-background hover:bg-secondary-background transition-colors"
               >
                 <div

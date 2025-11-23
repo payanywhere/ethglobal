@@ -11,6 +11,8 @@ import { WalletHeader } from "./components/wallet-header"
 import { useMerchantWallet } from "./hooks/use-merchant-wallet"
 import { useWalletBalances } from "./hooks/use-wallet-balances"
 import { useWalletTransactions } from "./hooks/use-wallet-transactions"
+import { Switch } from "@/components/ui/switch"
+import { getCurrency, setCurrency } from "@/lib/currency"
 
 export default function WalletPage() {
   const { walletAddress, ready } = useMerchantWallet()
@@ -18,6 +20,7 @@ export default function WalletPage() {
   const [showReceiveModal, setShowReceiveModal] = useState(false)
   const [showSwapModal, setShowSwapModal] = useState(false)
   const [dollarPrice, setDollarPrice] = useState<number | null>(null)
+  const [isARS, setIsARS] = useState<boolean | null>(null)
 
   // Custom hooks
   const {
@@ -52,8 +55,16 @@ export default function WalletPage() {
     fetchDollarPrice().then(price => {
       setDollarPrice(price);
     });
+
+    setIsARS(getCurrency() === "ARS");
   }, []);
-  
+
+  useEffect(() => {
+    if (isARS !== null) {
+      setCurrency(isARS ? "ARS" : "USD");
+    }
+  }, [isARS]);
+
   const handleSwap = useCallback(() => {
     setShowSwapModal(true)
   }, [])
@@ -98,11 +109,18 @@ export default function WalletPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-heading font-bold">Wallet</h1>
-        <p className="text-foreground/50 text-sm">Manage your crypto wallet and transactions</p>
-      </div>
+    <section className="space-y-6">
+      <section className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-heading font-bold">Wallet</h1>
+          <p className="text-foreground/50 text-sm">Manage your crypto wallet and transactions</p>
+        </div>
+        <div className="flex items-center gap-2 mt-4 justify-end">
+          <span>Currency:</span>
+          <Switch checked={isARS} onCheckedChange={setIsARS} />
+          <span>{isARS ? "ARS" : "USD"}</span>
+        </div>
+      </section>
 
       {/* Wallet Header with Total Balance and Quick Actions */}
       <WalletHeader
@@ -112,6 +130,7 @@ export default function WalletPage() {
         onReceive={handleReceive}
         onSwap={handleSwap}
         dollarPrice={dollarPrice}
+        isARS={isARS}
       />
 
       {/* Token Balances and Transaction History - Side by side on desktop */}
@@ -121,6 +140,8 @@ export default function WalletPage() {
           loading={loadingBalances}
           error={balancesError}
           onRefresh={refetchBalances}
+          isARS={isARS}
+          dollarPrice={dollarPrice ?? 0}
         />
         <TransactionHistory
           transactions={transactions}
@@ -152,6 +173,6 @@ export default function WalletPage() {
         tokens={balances}
         onSuccess={handleSwapSuccess}
       />
-    </div>
+    </section>
   )
 }

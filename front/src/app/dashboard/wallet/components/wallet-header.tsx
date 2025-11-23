@@ -7,6 +7,7 @@ interface WalletHeaderProps {
   totalValueUSD: number
   loading?: boolean
   dollarPrice?: number | null
+  isARS: boolean
   onSend?: () => void
   onReceive?: () => void
   onSwap?: () => void
@@ -15,7 +16,8 @@ interface WalletHeaderProps {
 export function WalletHeader({
   totalValueUSD,
   loading,
-  dollarPrice: _dollarPrice,
+  dollarPrice,
+  isARS,
   onSend,
   onReceive,
   onSwap
@@ -31,10 +33,12 @@ export function WalletHeader({
             ) : (
               <p className="text-3xl font-heading font-bold">
                 $
-                {totalValueUSD.toLocaleString("en-US", {
+                {(isARS ? totalValueUSD * (dollarPrice ?? 0) : totalValueUSD).toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })}
+                {" "}
+                {isARS ? "ARS" : "USD"}
               </p>
             )}
           </div>

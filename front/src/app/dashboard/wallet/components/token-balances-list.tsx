@@ -11,6 +11,8 @@ interface TokenBalancesListProps {
   loading: boolean
   error: string | null
   onRefresh?: () => void
+  isARS: boolean
+  dollarPrice: number
 }
 
 function TokenBalanceSkeleton() {
@@ -43,7 +45,7 @@ function TokenBalanceSkeleton() {
   )
 }
 
-export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBalancesListProps) {
+export function TokenBalancesList({ tokens, loading, error, onRefresh, isARS, dollarPrice }: TokenBalancesListProps) {
   // Generate stable skeleton keys that don't change between renders
   const skeletonKeys = useMemo(() => {
     return Array.from({ length: 5 }, (_, i) => `skeleton-loading-${i}`)
@@ -129,7 +131,7 @@ export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBa
           {loading && tokens.length > 0 ? (
             <>
               {tokens.map((token) => (
-                <TokenBalanceItem key={`${token.chain_id}-${token.address}`} token={token} />
+                <TokenBalanceItem key={`${token.chain_id}-${token.address}`} token={token} isARS={isARS} dollarPrice={dollarPrice} />
               ))}
               {/* Show a few skeletons at the end while refreshing */}
               {refreshSkeletonKeys.map((key) => (
@@ -138,7 +140,7 @@ export function TokenBalancesList({ tokens, loading, error, onRefresh }: TokenBa
             </>
           ) : (
             tokens.map((token) => (
-              <TokenBalanceItem key={`${token.chain_id}-${token.address}`} token={token} />
+              <TokenBalanceItem key={`${token.chain_id}-${token.address}`} token={token} isARS={isARS} dollarPrice={dollarPrice} />
             ))
           )}
         </div>

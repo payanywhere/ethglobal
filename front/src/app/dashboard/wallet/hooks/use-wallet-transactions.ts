@@ -3,6 +3,7 @@ import { getFriendlyErrorMessage } from "@/lib/error-utils"
 import { type ActivityItem, fetchWalletActivity } from "@/services/dune-sim-activity"
 
 export interface Transaction {
+  id: string
   hash: string
   from: string
   to: string
@@ -92,7 +93,7 @@ function isLikelySpamTransaction(item: ActivityItem): boolean {
 /**
  * Convert Dune Sim ActivityItem to Transaction format
  */
-function activityToTransaction(item: ActivityItem, walletAddress: string): Transaction | null {
+function activityToTransaction(item: ActivityItem, walletAddress: string, index: number): Transaction | null {
   // Filter out spam transactions
   if (isLikelySpamTransaction(item)) {
     return null
@@ -118,6 +119,7 @@ function activityToTransaction(item: ActivityItem, walletAddress: string): Trans
     (item.asset_type === "erc20" ? 18 : item.asset_type === "native" ? 18 : 0)
 
   return {
+    id: `${item.tx_hash}-${index}`,
     hash: item.tx_hash,
     from: item.from || "",
     to: item.to || "",
@@ -172,7 +174,7 @@ export function useWalletTransactions(address: string | null) {
 
       // Convert activity items to transactions and filter out nulls
       const txs = response.activity
-        .map((item) => activityToTransaction(item, address))
+        .map((item, index) => activityToTransaction(item, address, index))
         .filter((tx): tx is Transaction => tx !== null)
 
       setTransactions(txs)

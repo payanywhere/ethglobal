@@ -5,11 +5,13 @@ import { formatTokenAmount } from "@/services/dune-sim"
 
 interface TokenBalanceItemProps {
   token: TokenBalance
+  isARS: boolean
+  dollarPrice: number
 }
 
-export const TokenBalanceItem = memo(function TokenBalanceItem({ token }: TokenBalanceItemProps) {
+export const TokenBalanceItem = memo(function TokenBalanceItem({ token, isARS, dollarPrice }: TokenBalanceItemProps) {
   const formattedAmount = formatTokenAmount(token.amount, token.decimals)
-  const valueUSD = token.value_usd || 0
+  const value = isARS ? (Number(token.value_usd) * (dollarPrice ?? 0)) : token.value_usd || 0
 
   return (
     <div className="group relative p-4 rounded-base border border-border bg-background hover:border-foreground/20 hover:shadow-sm transition-all duration-200">
@@ -52,8 +54,8 @@ export const TokenBalanceItem = memo(function TokenBalanceItem({ token }: TokenB
             <div className="text-right flex-shrink-0">
               <p className="font-heading font-semibold text-base mb-1">{formattedAmount}</p>
               <p className="text-sm font-medium text-foreground/60">
-                $
-                {valueUSD.toLocaleString("en-US", {
+                {isARS ? "$" : "ARS"}
+                {value.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })}

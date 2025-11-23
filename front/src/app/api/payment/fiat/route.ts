@@ -1,3 +1,4 @@
+import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 import { type NextRequest, NextResponse } from "next/server"
 
 interface FiatPaymentRequest {
@@ -30,13 +31,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const dollarPrice = await fetchDollarPrice();
+
     const preferenceBody = {
       items: [
         {
           title: description ?? `Payment to ${merchant_id}`,
           quantity: 1,
           currency_id: "ARS",
-          unit_price: amount_usd
+          unit_price: amount_usd * dollarPrice
         }
       ],
       back_urls: {
