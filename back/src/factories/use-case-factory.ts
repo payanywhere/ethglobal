@@ -75,5 +75,5 @@ export function getCashierDetailsUseCase(): GetCashierDetailsUseCase {
 
 // Consolidate use cases
 export function consolidatePaymentsUseCase(): ConsolidatePaymentsUseCase {
-  return new ConsolidatePaymentsUseCase(consolidatorContract)
+  return new ConsolidatePaymentsUseCase(paymentRepository)
 }
