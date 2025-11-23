@@ -51,6 +51,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
   } | null>(null)
   const [estimatingPrice, setEstimatingPrice] = useState(false)
   const [currentNetwork, setCurrentNetwork] = useState<CdpSupportedNetwork | null>(null)
+  const [isSwapping, setIsSwapping] = useState(false) // Track if swap is in progress
   const [showFromTokenList, setShowFromTokenList] = useState(false)
   const [showToTokenList, setShowToTokenList] = useState(false)
   const fromTokenRef = useRef<HTMLDivElement>(null)
@@ -233,6 +234,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
     try {
       setLoading(true)
+      setIsSwapping(true) // Prevent modal from closing during swap
       setError(null)
 
       if (!primaryWallet) {
@@ -647,6 +649,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
       setError(errorMessage)
     } finally {
       setLoading(false)
+      setIsSwapping(false) // Allow modal to close again
     }
   }, [
     selectedFromToken,
@@ -699,9 +702,22 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
   const noSupportedTokens = availableFromTokens.length === 0
 
+  // Wrap onOpenChange to prevent closing during swap operations
+  const handleOpenChange = useCallback((newOpen: boolean) => {
+    // Prevent closing if we're in the middle of a swap operation
+    if (!newOpen && (loading || approvingToken || isSwapping)) {
+      console.log("Preventing modal close - swap in progress")
+      return
+    }
+    onOpenChange(newOpen)
+  }, [onOpenChange, loading, approvingToken, isSwapping])
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg border border-border p-0 overflow-hidden">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent 
+        className="max-w-lg border border-border p-0 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <DialogHeader>
           <div className="px-6 pt-6">
             <DialogTitle>Swap Tokens</DialogTitle>
@@ -711,7 +727,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 px-6 pb-6 pt-2">
+        <div 
+          className="space-y-6 px-6 pb-6 pt-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           {success ? (
             <div className="space-y-4 text-center py-8">
               <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mx-auto">
@@ -789,7 +808,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
                     {showFromTokenList && (
-                      <div className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto">
+                      <div 
+                        className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="p-2 space-y-1">
                           {availableFromTokens.map((token) => {
                             const balance = formatTokenAmount(token.amount, token.decimals)
@@ -920,7 +942,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
                     {showToTokenList && currentNetwork && filteredToTokens.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto">
+                      <div 
+                        className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="p-2 space-y-1">
                           {filteredToTokens.map((token) => {
                             const isSelected = selectedToToken?.address === token.address
