@@ -1,11 +1,21 @@
 "use client"
 
-import { CreditCard, DollarSign, Plus, TrendingUp, Users, CheckCircle2, Clock, ExternalLink, Loader2, XCircle } from "lucide-react"
-import Image from "next/image"
+import {
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  DollarSign,
+  ExternalLink,
+  Loader2,
+  Plus,
+  TrendingUp,
+  Users,
+  XCircle
+} from "lucide-react"
 import Link from "next/link"
-import QRCode from "qrcode"
-import { memo, Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import QRCode from "qrcode"
+import { memo, useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -16,8 +26,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { useMerchantVerification } from "@/hooks/use-merchant-verification"
 import { useMerchant } from "@/contexts/merchant-context"
+import { useMerchantVerification } from "@/hooks/use-merchant-verification"
 import { cn } from "@/lib/utils"
 import type { Payment } from "@/services/api"
 
@@ -83,54 +93,58 @@ const CashierBadge = memo(({ cashierName }: { cashierName: string }) => {
 CashierBadge.displayName = "CashierBadge"
 
 // Memoized table row component
-const PaymentRow = memo(({ payment, cashierName }: { payment: PaymentRecord, cashierName: string }) => {
-  const router = useRouter()
+const PaymentRow = memo(
+  ({ payment, cashierName }: { payment: PaymentRecord; cashierName: string }) => {
+    const router = useRouter()
 
-  const handleViewPayment = useCallback(() => {
-    if (payment.id) {
-      router.push(`/pay/${payment.cashier_id}`)
-    }
-  }, [payment.cashier_id, router])
+    const handleViewPayment = useCallback(() => {
+      if (payment.id) {
+        router.push(`/pay/${payment.cashier_id}`)
+      }
+    }, [payment.cashier_id, router, payment.id])
 
-  const formatDate = useCallback((date: Date | string) => {
-    const d = typeof date === "string" ? new Date(date) : date
-    return d.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    })
-  }, [])
+    const formatDate = useCallback((date: Date | string) => {
+      const d = typeof date === "string" ? new Date(date) : date
+      return d.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      })
+    }, [])
 
-  return (
-    <TableRow className="bg-background hover:bg-secondary-background border-b border-border">
-      <TableCell className="font-medium text-foreground font-mono text-sm">{payment.id}</TableCell>
-      <TableCell className="text-foreground">${payment.amount_usd.toFixed(2)}</TableCell>
-      <TableCell className="text-foreground">
-        <CashierBadge cashierName={cashierName} />
-      </TableCell>
-      <TableCell className="text-foreground">
-        <StatusBadge status={payment.status} />
-      </TableCell>
-      <TableCell className="text-foreground text-sm">{formatDate(payment.createdAt)}</TableCell>
+    return (
+      <TableRow className="bg-background hover:bg-secondary-background border-b border-border">
+        <TableCell className="font-medium text-foreground font-mono text-sm">
+          {payment.id}
+        </TableCell>
+        <TableCell className="text-foreground">${payment.amount_usd.toFixed(2)}</TableCell>
+        <TableCell className="text-foreground">
+          <CashierBadge cashierName={cashierName} />
+        </TableCell>
+        <TableCell className="text-foreground">
+          <StatusBadge status={payment.status} />
+        </TableCell>
+        <TableCell className="text-foreground text-sm">{formatDate(payment.createdAt)}</TableCell>
 
-      <TableCell className="text-foreground text-sm">
-        <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
-          <ExternalLink className="h-3 w-3" />
-          View
-        </Button>
-      </TableCell>
-    </TableRow>
-  )
-})
+        <TableCell className="text-foreground text-sm">
+          <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
+            <ExternalLink className="h-3 w-3" />
+            View
+          </Button>
+        </TableCell>
+      </TableRow>
+    )
+  }
+)
 PaymentRow.displayName = "PaymentRow"
 
 export default function DashboardPage() {
-  const [qrData, setQrData] = useState<string>("")
-  const [paymentLink, setPaymentLink] = useState<string>("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>("")
+  const [_qrData, setQrData] = useState<string>("")
+  const [_paymentLink, setPaymentLink] = useState<string>("")
+  const [_loading, setLoading] = useState(false)
+  const [_error, setError] = useState<string>("")
 
   // Payments history state
   const { payments: paymentsFromHook, walletAddress, isVerifying } = useMerchantVerification()
@@ -138,12 +152,15 @@ export default function DashboardPage() {
   const [payments, setPayments] = useState<PaymentRecord[]>([])
   const [paymentsLoading, setPaymentsLoading] = useState(true)
   const [paymentsError, setPaymentsError] = useState<string | null>(null)
-  const router = useRouter()
+  const _router = useRouter()
 
-  const getCashierNameFromID = useCallback((cashierId: string) => {
-    const cashier = cashiers.find((c) => c.uuid === cashierId)
-    return cashier?.name ?? "Default Cashier"
-  }, [cashiers])
+  const getCashierNameFromID = useCallback(
+    (cashierId: string) => {
+      const cashier = cashiers.find((c) => c.uuid === cashierId)
+      return cashier?.name ?? "Default Cashier"
+    },
+    [cashiers]
+  )
 
   // Convert payments from hook to PaymentRecord format
   useEffect(() => {
@@ -282,14 +299,10 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Recent Payments</CardTitle>
-              <CardDescription>
-                A list of your most recent payment transactions
-              </CardDescription>
+              <CardDescription>A list of your most recent payment transactions</CardDescription>
             </div>
             <Button variant="neutral" size="sm" asChild>
-              <Link href="/dashboard/payments">
-                View All
-              </Link>
+              <Link href="/dashboard/payments">View All</Link>
             </Button>
           </div>
         </CardHeader>
@@ -327,7 +340,11 @@ export default function DashboardPage() {
                 </TableHeader>
                 <TableBody>
                   {payments.slice(0, 5).map((payment) => (
-                    <PaymentRow key={payment.id} payment={payment} cashierName={getCashierNameFromID(payment.cashier_id)} />
+                    <PaymentRow
+                      key={payment.id}
+                      payment={payment}
+                      cashierName={getCashierNameFromID(payment.cashier_id)}
+                    />
                   ))}
                 </TableBody>
               </Table>

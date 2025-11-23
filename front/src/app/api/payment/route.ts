@@ -1,5 +1,5 @@
-import { getPaymentsByMerchantId } from "@/services/payment"
 import { type NextRequest, NextResponse } from "next/server"
+import { getPaymentsByMerchantId } from "@/services/payment"
 
 type PaymentRecord = {
   payment_id: string
@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ payment_id, qr_url, status: "pending" })
 }
 
-
 /**
  * Get latest merchant cashier payment order. Payment ID is the cashier ID.
  * 
@@ -54,8 +53,8 @@ export async function GET(req: NextRequest) {
 
   if (!id) return new NextResponse("Payment ID is required", { status: 400 })
 
-  const cashierOrders = await getPaymentsByMerchantId(id);
-  
+  const cashierOrders = await getPaymentsByMerchantId(id)
+
   // Sort cashier orders by createdAt descending
   cashierOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 

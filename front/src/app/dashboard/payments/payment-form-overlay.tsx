@@ -1,10 +1,10 @@
 "use client"
 
-import { Loader2, QrCode, Printer } from "lucide-react"
+import { jsPDF } from "jspdf"
+import { Loader2, Printer, QrCode } from "lucide-react"
 import Image from "next/image"
 import QRCode from "qrcode"
 import { memo, useCallback, useEffect, useState } from "react"
-import { jsPDF } from "jspdf"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -30,16 +30,9 @@ interface PaymentFormOverlayProps {
 export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   open,
   onClose,
-  onSuccess,
-  merchantId
+  onSuccess
 }: PaymentFormOverlayProps) {
-  const {
-    walletAddress,
-    cashiers,
-    refreshCashiers,
-    isLoading: isLoadingContext,
-    merchant
-  } = useMerchant()
+  const { cashiers, refreshCashiers, isLoading: isLoadingContext, merchant } = useMerchant()
   const [amount, setAmount] = useState<number>(10)
   const [description, setDescription] = useState<string>("")
   const [email, setEmail] = useState<string>("")
@@ -47,7 +40,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [qrImage, setQrImage] = useState<string>("")
-  const [paymentData, setPaymentData] = useState<{ id: string, link: string } | null>(null)
+  const [paymentData, setPaymentData] = useState<{ id: string; link: string } | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -57,16 +50,16 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
 
   useEffect(() => {
     if (!open) return
-   
+
     if (cashiers.length === 0) {
-      refreshCashiers().catch((err) => {
+      refreshCashiers().catch((_err) => {
         setError("error loading cashiers")
       })
     } else if (!selectedCashierId) {
       setSelectedCashierId(cashiers[0].uuid)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, walletAddress])
+  }, [open, cashiers.length, cashiers[0].uuid, refreshCashiers, selectedCashierId])
 
   useEffect(() => {
     if (cashiers.length > 0 && !selectedCashierId) {
@@ -136,7 +129,6 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
         }
       })
       setQrImage(qr)
-
     } catch (e) {
       console.error("Error creating payment", e)
       setError(e instanceof Error ? e.message : "An unexpected error occurred")
@@ -150,30 +142,30 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
 
     const doc = new jsPDF()
     const pageWidth = doc.internal.pageSize.getWidth()
-    
+
     // Title
     doc.setFontSize(22)
     doc.text("Pay here", pageWidth / 2, 25, { align: "center" })
-    
+
     // QR Code
     const qrSize = 120
     const qrY = 55
     doc.addImage(qrImage, "PNG", (pageWidth - qrSize) / 2, qrY, qrSize, qrSize)
-    
+
     // Description
     if (description) {
       doc.setFontSize(14)
       const descLines = doc.splitTextToSize(description, 160)
       doc.text(descLines, pageWidth / 2, qrY + qrSize + 20, { align: "center" })
     }
-    
+
     // Footer Link
     doc.setFontSize(10)
     doc.setTextColor(100)
     doc.text(paymentData.link, pageWidth / 2, 280, { align: "center" })
 
     doc.save(`payment-${paymentData.id}.pdf`)
-  }, [qrImage, paymentData, amount, description])
+  }, [qrImage, paymentData, description])
 
   // Handle success and close
   const handleSuccess = useCallback(() => {
@@ -186,9 +178,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Payment</DialogTitle>
-          <DialogDescription>
-            Generate a QR code to receive payment.
-          </DialogDescription>
+          <DialogDescription>Generate a QR code to receive payment.</DialogDescription>
         </DialogHeader>
 
         {!paymentData ? (
@@ -321,10 +311,12 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
                         <p className="text-base font-base">{description}</p>
                       </div>
                     )}
-                    
+
                     <div className="p-4 rounded-base border-2 border-border bg-secondary-background space-y-2 shadow-shadow">
-                       <p className="text-sm font-heading text-foreground/50">Payment Link</p>
-                       <p className="text-xs font-mono break-all text-foreground/70">{paymentData.link}</p>
+                      <p className="text-sm font-heading text-foreground/50">Payment Link</p>
+                      <p className="text-xs font-mono break-all text-foreground/70">
+                        {paymentData.link}
+                      </p>
                     </div>
                   </div>
 

@@ -39,7 +39,7 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
       merchantContext.setWalletAddress(walletAddress)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress]) // Only depend on walletAddress, not the entire context
+  }, [walletAddress, merchantContext.setWalletAddress, merchantContext.walletAddress]) // Only depend on walletAddress, not the entire context
 
   // Set the address as soon as it is available
   useEffect(() => {
@@ -134,7 +134,7 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
           `wallet_${currentAddress.slice(2, 10)}@payanywhere.local`
         console.log("email to verify", userEmail)
         let merchantByEmail: Merchant | null = null
-        if (userEmail && userEmail.includes("@")) {
+        if (userEmail?.includes("@")) {
           try {
             merchantByEmail = await getMerchantByEmail(userEmail)
             if (merchantByEmail) {
@@ -206,7 +206,17 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
     }
 
     verifyAndCreateMerchant()
-  }, [isAuthenticated, isAuthLoading, primaryWallet?.address, user])
+  }, [
+    isAuthenticated,
+    isAuthLoading,
+    primaryWallet?.address,
+    user,
+    merchantContext.setMerchant,
+    merchantContext.setPayments,
+    merchantContext.setWalletAddress,
+    merchantContext.setCashiers,
+    primaryWallet
+  ])
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -221,7 +231,13 @@ export function useMerchantVerification(): UseMerchantVerificationResult {
       merchantContext.setPayments([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated])
+  }, [
+    isAuthenticated,
+    merchantContext.setCashiers,
+    merchantContext.setMerchant,
+    merchantContext.setPayments,
+    merchantContext.setWalletAddress
+  ])
 
   return {
     isVerifying,

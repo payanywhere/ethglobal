@@ -6,7 +6,7 @@ import type { Cashier, Merchant, Payment } from "@/services/api"
 interface MerchantContextValue {
   merchant: Merchant | null
   walletAddress: string | null
-  
+
   cashiers: Cashier[]
   payments: Payment[]
   isLoading: boolean

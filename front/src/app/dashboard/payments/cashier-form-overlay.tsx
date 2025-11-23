@@ -84,9 +84,7 @@ export const CashierFormOverlay = memo(function CashierFormOverlay({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Crear Cashier</DialogTitle>
-          <DialogDescription>
-            Crea un nuevo cashier para tu merchant
-          </DialogDescription>
+          <DialogDescription>Crea un nuevo cashier para tu merchant</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -109,9 +107,7 @@ export const CashierFormOverlay = memo(function CashierFormOverlay({
               disabled={loading}
               className="text-lg"
             />
-            <p className="text-sm text-foreground/50 font-base">
-              Enter the name of the cashier
-            </p>
+            <p className="text-sm text-foreground/50 font-base">Enter the name of the cashier</p>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -121,10 +117,7 @@ export const CashierFormOverlay = memo(function CashierFormOverlay({
               onCheckedChange={(checked) => setStatus(checked === true)}
               disabled={loading}
             />
-            <Label
-              htmlFor="status"
-              className="text-base font-heading cursor-pointer"
-            >
+            <Label htmlFor="status" className="text-base font-heading cursor-pointer">
               Enabled
             </Label>
           </div>

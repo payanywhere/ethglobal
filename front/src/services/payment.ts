@@ -1,4 +1,4 @@
-import api, { Cashier, Merchant, type Payment } from "./api"
+import api, { type Cashier, type Payment } from "./api"
 
 /**
  * Service for handling merchant payment-related API calls.
@@ -11,24 +11,24 @@ import api, { Cashier, Merchant, type Payment } from "./api"
  * and matches the first occurrence by uuid.
  */
 export async function getMerchantIdFromUuid(uuid: string): Promise<string> {
-    const res = await api.get<Cashier[]>(`/cashiers`);
-    if (!Array.isArray(res.data)) return "";
+  const res = await api.get<Cashier[]>(`/cashiers`)
+  if (!Array.isArray(res.data)) return ""
 
-    const cashier = res.data.find((m: Cashier) => m.uuid === uuid);
+  const cashier = res.data.find((m: Cashier) => m.uuid === uuid)
 
-    // Heuristic: prefer returning merchantId that exactly matches the pattern of a Mongo-like 24 hex char string.
-    if (cashier?.merchantId && /^[a-f\d]{24}$/i.test(cashier.merchantId)) {
-        return cashier.merchantId;
-    }
+  // Heuristic: prefer returning merchantId that exactly matches the pattern of a Mongo-like 24 hex char string.
+  if (cashier?.merchantId && /^[a-f\d]{24}$/i.test(cashier.merchantId)) {
+    return cashier.merchantId
+  }
 
-    // Fallback: if merchantId starts with 'sss' or other stray prefix, remove non-hex leading chars
-    if (cashier?.merchantId) {
-        const possibleId = cashier.merchantId.match(/[a-f\d]{24}/i);
-        if (possibleId) return possibleId[0];
-        // Return as is if no pattern found
-        return cashier.merchantId;
-    }
-    return "";
+  // Fallback: if merchantId starts with 'sss' or other stray prefix, remove non-hex leading chars
+  if (cashier?.merchantId) {
+    const possibleId = cashier.merchantId.match(/[a-f\d]{24}/i)
+    if (possibleId) return possibleId[0]
+    // Return as is if no pattern found
+    return cashier.merchantId
+  }
+  return ""
 }
 
 /**
@@ -37,9 +37,9 @@ export async function getMerchantIdFromUuid(uuid: string): Promise<string> {
  * @returns Promise resolving to an array of payments for the merchant.
  */
 export async function getPaymentsByMerchantId(merchantUuid: string): Promise<Payment[]> {
-  const merchantId = await getMerchantIdFromUuid(merchantUuid);
+  const merchantId = await getMerchantIdFromUuid(merchantUuid)
 
   const res = await api.get<Payment[]>(`/payments/${merchantId}`)
-  
+
   return res.data
 }

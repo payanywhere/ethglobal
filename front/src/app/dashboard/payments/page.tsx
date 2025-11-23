@@ -13,11 +13,11 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
+import { useMerchant } from "@/contexts/merchant-context"
 import { useMerchantVerification } from "@/hooks/use-merchant-verification"
 import { cn } from "@/lib/utils"
 import type { Payment } from "@/services/api"
 import { PaymentFormOverlay } from "./payment-form-overlay"
-import { useMerchant } from "@/contexts/merchant-context"
 
 interface PaymentRecord {
   id: string
@@ -77,50 +77,54 @@ const CashierBadge = memo(({ cashierName }: { cashierName: string }) => {
 CashierBadge.displayName = "CashierBadge"
 
 // Memoized table row component
-const PaymentRow = memo(({ payment, cashierName }: { payment: PaymentRecord, cashierName: string }) => {
-  const router = useRouter()
+const PaymentRow = memo(
+  ({ payment, cashierName }: { payment: PaymentRecord; cashierName: string }) => {
+    const router = useRouter()
 
-  /**
-   * Handle view payment, redirect to cashier's payment page
-   */
-  const handleViewPayment = useCallback(() => {
-    if (payment.id) {
-      router.push(`/pay/${payment.cashier_id}`)
-    }
-  }, [payment.cashier_id, router])
+    /**
+     * Handle view payment, redirect to cashier's payment page
+     */
+    const handleViewPayment = useCallback(() => {
+      if (payment.id) {
+        router.push(`/pay/${payment.cashier_id}`)
+      }
+    }, [payment.cashier_id, router, payment.id])
 
-  const formatDate = useCallback((date: Date | string) => {
-    const d = typeof date === "string" ? new Date(date) : date
-    return d.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    })
-  }, [])
+    const formatDate = useCallback((date: Date | string) => {
+      const d = typeof date === "string" ? new Date(date) : date
+      return d.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      })
+    }, [])
 
-  return (
-    <TableRow className="bg-background hover:bg-secondary-background border-b border-border">
-      <TableCell className="font-medium text-foreground font-mono text-sm">{payment.id}</TableCell>
-      <TableCell className="text-foreground">${payment.amount_usd.toFixed(2)}</TableCell>
-      <TableCell className="text-foreground">
-        <CashierBadge cashierName={cashierName} />
-      </TableCell>
-      <TableCell className="text-foreground">
-        <StatusBadge status={payment.status} />
-      </TableCell>
-      <TableCell className="text-foreground text-sm">{formatDate(payment.createdAt)}</TableCell>
+    return (
+      <TableRow className="bg-background hover:bg-secondary-background border-b border-border">
+        <TableCell className="font-medium text-foreground font-mono text-sm">
+          {payment.id}
+        </TableCell>
+        <TableCell className="text-foreground">${payment.amount_usd.toFixed(2)}</TableCell>
+        <TableCell className="text-foreground">
+          <CashierBadge cashierName={cashierName} />
+        </TableCell>
+        <TableCell className="text-foreground">
+          <StatusBadge status={payment.status} />
+        </TableCell>
+        <TableCell className="text-foreground text-sm">{formatDate(payment.createdAt)}</TableCell>
 
-      <TableCell className="text-foreground text-sm">
-        <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
-          <ExternalLink className="h-3 w-3" />
-          View
-        </Button>
-      </TableCell>
-    </TableRow>
-  )
-})
+        <TableCell className="text-foreground text-sm">
+          <Button variant="noShadow" size="sm" onClick={handleViewPayment} className="gap-1">
+            <ExternalLink className="h-3 w-3" />
+            View
+          </Button>
+        </TableCell>
+      </TableRow>
+    )
+  }
+)
 PaymentRow.displayName = "PaymentRow"
 
 function PaymentsPageContent() {
@@ -135,10 +139,13 @@ function PaymentsPageContent() {
   // Check if form should be open from URL params
   const isFormOpen = useMemo(() => searchParams.get("create") === "true", [searchParams])
 
-  const getCashierNameFromID = useCallback((cashierId: string) => {
-    const cashier = cashiers.find((c) => c.uuid === cashierId)
-    return cashier?.name ?? "Default Cashier"
-  }, [cashiers])
+  const getCashierNameFromID = useCallback(
+    (cashierId: string) => {
+      const cashier = cashiers.find((c) => c.uuid === cashierId)
+      return cashier?.name ?? "Default Cashier"
+    },
+    [cashiers]
+  )
 
   // Convert payments from hook to PaymentRecord format
   useEffect(() => {
@@ -300,7 +307,11 @@ function PaymentsPageContent() {
                 </TableHeader>
                 <TableBody>
                   {payments.map((payment) => (
-                    <PaymentRow key={payment.id} payment={payment} cashierName={getCashierNameFromID(payment.cashier_id)} />
+                    <PaymentRow
+                      key={payment.id}
+                      payment={payment}
+                      cashierName={getCashierNameFromID(payment.cashier_id)}
+                    />
                   ))}
                 </TableBody>
               </Table>
