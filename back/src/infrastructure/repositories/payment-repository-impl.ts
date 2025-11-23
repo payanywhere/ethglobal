@@ -40,9 +40,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       throw new Error("MongoDB not connected. Cannot get payments")
     }
 
-    const payments = await PaymentModel.find({ status: "pending" })
-      .sort({ createdAt: -1 })
-      .exec()
+    const payments = await PaymentModel.find({ status: "pending" }).sort({ createdAt: -1 }).exec()
     return payments.map((payment) => payment.toObject() as Payment)
   }
 
