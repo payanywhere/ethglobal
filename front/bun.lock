@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "payanywhere-front",
@@ -37,6 +38,7 @@
         "lucide-react": "^0.554.0",
         "next": "16.0.1",
         "next-themes": "^0.4.6",
+        "porto": "^0.2.37",
         "qrcode": "^1.5.4",
         "react": "19.2.0",
         "react-day-picker": "8.10.1",
@@ -1035,6 +1037,8 @@
 
     "hoist-non-react-statics": ["hoist-non-react-statics@3.3.2", "", { "dependencies": { "react-is": "^16.7.0" } }, "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw=="],
 
+    "hono": ["hono@4.10.6", "", {}, "sha512-BIdolzGpDO9MQ4nu3AUuDwHZZ+KViNm+EZ75Ae55eMXMqLVhDFqEMXxtUe9Qh8hjL+pIna/frs2j6Y2yD5Ua/g=="],
+
     "hpke-js": ["hpke-js@1.6.5", "", { "dependencies": { "@hpke/chacha20poly1305": "^1.7.0", "@hpke/common": "^1.8.1", "@hpke/core": "^1.7.5", "@hpke/dhkem-x25519": "^1.6.4", "@hpke/dhkem-x448": "^1.6.4" } }, "sha512-amUFmHr6Z16370Wn57lYOkl+gb3wDBUc0nyPlx9ODMTaJ09kAVY0MrOU7JCzJJjL0bN8nKPU5vfXLBRjCmREOw=="],
 
     "html-parse-stringify": ["html-parse-stringify@3.0.1", "", { "dependencies": { "void-elements": "3.1.0" } }, "sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg=="],
@@ -1252,6 +1256,8 @@
     "pngjs": ["pngjs@5.0.0", "", {}, "sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw=="],
 
     "pony-cause": ["pony-cause@2.1.11", "", {}, "sha512-M7LhCsdNbNgiLYiP4WjsfLUuFmCfnjdF6jKe2R9NKl4WFN+HZPGHJZ9lnLP7f9ZnKe3U9nuWD0szirmj+migUg=="],
+
+    "porto": ["porto@0.2.37", "", { "dependencies": { "hono": "^4.10.3", "idb-keyval": "^6.2.1", "mipd": "^0.0.7", "ox": "^0.9.6", "zod": "^4.1.5", "zustand": "^5.0.1" }, "peerDependencies": { "@tanstack/react-query": ">=5.59.0", "@wagmi/core": ">=2.16.3", "expo-auth-session": ">=7.0.8", "expo-crypto": ">=15.0.7", "expo-web-browser": ">=15.0.8", "react": ">=18", "react-native": ">=0.81.4", "typescript": ">=5.4.0", "viem": ">=2.37.0", "wagmi": ">=2.0.0" }, "optionalPeers": ["@tanstack/react-query", "expo-auth-session", "expo-crypto", "expo-web-browser", "react", "react-native", "typescript", "wagmi"], "bin": { "porto": "dist/cli/bin/index.js" } }, "sha512-l3IOUvf5O9rM82VW7v/R5Y2X2niU1kmfXMYYPr/VLMvtKKySr7PiAO3TXWjGft5PV17800VnMCmEaRuxA+N4ug=="],
 
     "poseidon-lite": ["poseidon-lite@0.2.1", "", {}, "sha512-xIr+G6HeYfOhCuswdqcFpSX47SPhm0EpisWJ6h7fHlWwaVIvH3dLnejpatrtw6Xc6HaLrpq05y7VRfvDmDGIog=="],
 
@@ -1836,6 +1842,8 @@
     "parse-asn1/safe-buffer": ["safe-buffer@5.2.1", "", {}, "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ=="],
 
     "pbkdf2/safe-buffer": ["safe-buffer@5.2.1", "", {}, "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ=="],
+
+    "porto/zustand": ["zustand@5.0.3", "", { "peerDependencies": { "@types/react": ">=18.0.0", "immer": ">=9.0.6", "react": ">=18.0.0", "use-sync-external-store": ">=1.2.0" }, "optionalPeers": ["@types/react", "immer", "react", "use-sync-external-store"] }, "sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg=="],
 
     "prop-types/react-is": ["react-is@16.13.1", "", {}, "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="],
 

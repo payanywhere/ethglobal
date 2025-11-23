@@ -104,6 +104,7 @@ const nextConfig: NextConfig = {
                 https://api.sim.dune.com
                 https://coins.llama.fi
                 https://*.llama.fi
+                https://criptoya.com/
                 https://cloudflare-eth.com
                 https://*.infura.io
                 https://*.alchemy.com
