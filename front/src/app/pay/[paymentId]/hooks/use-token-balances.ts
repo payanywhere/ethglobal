@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useAccount } from "wagmi"
+import { getFriendlyErrorMessage } from "@/lib/error-utils"
 import {
   fetchWalletBalances,
   filterTokensWithSufficientBalance,
   type TokenBalance
 } from "@/services/dune-sim"
-import { getFriendlyErrorMessage } from "@/lib/error-utils"
 import type { PaymentDetails } from "../types"
 
 export function useTokenBalances(payment: PaymentDetails | null) {
@@ -28,7 +28,7 @@ export function useTokenBalances(payment: PaymentDetails | null) {
 
     // Create a unique key for this request
     const requestKey = `${address}-${payment.payment_id}`
-    
+
     // Prevent duplicate calls
     if (isLoadingRef.current) {
       return
@@ -83,7 +83,7 @@ export function useTokenBalances(payment: PaymentDetails | null) {
       setSelectedToken(null)
       lastKeyRef.current = null
     }
-  }, [isConnected, address, payment?.payment_id, loadBalances])
+  }, [isConnected, address, payment?.payment_id, loadBalances, payment])
 
   return {
     balances,
@@ -94,4 +94,3 @@ export function useTokenBalances(payment: PaymentDetails | null) {
     loadBalances
   }
 }
-

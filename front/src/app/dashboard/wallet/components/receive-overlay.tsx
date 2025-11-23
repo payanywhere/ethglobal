@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Copy, ExternalLink, Check } from "lucide-react"
+import { Check, Copy, ExternalLink } from "lucide-react"
 import QRCode from "qrcode"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 
 interface ReceiveOverlayProps {
   open: boolean
@@ -84,18 +84,15 @@ export function ReceiveOverlay({ open, onOpenChange, address }: ReceiveOverlayPr
           <div className="space-y-3">
             <p className="text-sm font-heading text-foreground/50 text-center">Wallet Address</p>
             <div className="p-3 rounded-base border border-border bg-secondary-background">
-              <p className="text-sm font-mono text-foreground/70 break-all text-center">{address}</p>
+              <p className="text-sm font-mono text-foreground/70 break-all text-center">
+                {address}
+              </p>
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3">
-            <Button
-              variant="default"
-              size="sm"
-              onClick={copyAddress}
-              className="flex-1 gap-2"
-            >
+            <Button variant="default" size="sm" onClick={copyAddress} className="flex-1 gap-2">
               {copied ? (
                 <>
                   <Check className="h-4 w-4" />
@@ -108,12 +105,7 @@ export function ReceiveOverlay({ open, onOpenChange, address }: ReceiveOverlayPr
                 </>
               )}
             </Button>
-            <Button
-              variant="neutral"
-              size="sm"
-              onClick={viewOnExplorer}
-              className="flex-1 gap-2"
-            >
+            <Button variant="neutral" size="sm" onClick={viewOnExplorer} className="flex-1 gap-2">
               <ExternalLink className="h-4 w-4" />
               <span>Explorer</span>
             </Button>
@@ -123,4 +115,3 @@ export function ReceiveOverlay({ open, onOpenChange, address }: ReceiveOverlayPr
     </Dialog>
   )
 }
-

@@ -27,4 +27,3 @@ export function useMerchantWallet() {
     isAuthenticated
   }
 }
-

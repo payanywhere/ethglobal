@@ -1,6 +1,6 @@
 "use client"
 
-import { createAppKit, type AppKitOptions } from "@reown/appkit/react"
+import { type AppKitOptions, createAppKit } from "@reown/appkit/react"
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi"
 import { QueryClient } from "@tanstack/react-query"
 import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains"
@@ -27,7 +27,10 @@ export const queryClient = new QueryClient()
 // Create AppKit instance
 export const appKit = createAppKit({
   adapters: [wagmiAdapter],
-  networks: chains as unknown as [AppKitOptions['networks'][number], ...AppKitOptions['networks'][number][]],
+  networks: chains as unknown as [
+    AppKitOptions["networks"][number],
+    ...AppKitOptions["networks"][number][]
+  ],
   projectId,
   metadata: {
     name: "PayAnyWhere",

@@ -1,9 +1,9 @@
-import { CreditCard, Loader2 } from "lucide-react"
+import type { Variants } from "framer-motion"
 import { AnimatePresence, motion } from "framer-motion"
+import { CreditCard, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ANIMATION_TRANSITION } from "../constants"
-import type { Variants } from "framer-motion"
 
 interface FiatPaymentCardProps {
   isConnected: boolean
@@ -12,7 +12,12 @@ interface FiatPaymentCardProps {
   variants?: Variants
 }
 
-export function FiatPaymentCard({ isConnected, processing, onPay, variants }: FiatPaymentCardProps) {
+export function FiatPaymentCard({
+  isConnected,
+  processing,
+  onPay,
+  variants
+}: FiatPaymentCardProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -71,4 +76,3 @@ export function FiatPaymentCard({ isConnected, processing, onPay, variants }: Fi
     </AnimatePresence>
   )
 }
-

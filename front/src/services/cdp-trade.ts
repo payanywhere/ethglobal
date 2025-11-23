@@ -1,15 +1,15 @@
 /**
  * CDP Trade API Service
  * Documentation: https://docs.cdp.coinbase.com/trade-api/quickstart
- * 
+ *
  * Supports onchain token swaps (trades) on Ethereum and Base networks.
  * Provides price estimation, swap quotes, and execution for both:
  * - Regular Accounts (EOAs)
  * - Smart Accounts (ERC-4337)
  */
 
-import { CdpClient } from "@coinbase/cdp-sdk"
 import type { Account } from "@coinbase/cdp-sdk"
+import { CdpClient } from "@coinbase/cdp-sdk"
 
 /**
  * CDP-supported networks
@@ -132,12 +132,12 @@ function validateNetwork(network: string): asserts network is CdpSupportedNetwor
 /**
  * Get CDP client instance
  * Creates a singleton client for reuse across requests
- * 
+ *
  * Configuration via environment variables:
  * - CDP_API_KEY_APPID: Your CDP API key ID
  * - CDP_API_KEY_SECRET: Your CDP API key secret
  * - CDP_WALLET_SECRET: Your CDP wallet secret
- * 
+ *
  * Get credentials from: https://portal.cdp.coinbase.com/
  */
 let cdpClientInstance: CdpClient | null = null
@@ -151,7 +151,7 @@ function getCdpClient(): CdpClient {
     if (!apiKeyId || !apiKeySecret || !walletSecret) {
       console.warn(
         "CDP API credentials not configured. Set CDP_API_KEY_APPID, CDP_API_KEY_SECRET, and CDP_WALLET_SECRET environment variables. " +
-        "Get credentials from: https://portal.cdp.coinbase.com/"
+          "Get credentials from: https://portal.cdp.coinbase.com/"
       )
     }
 
@@ -166,14 +166,14 @@ function getCdpClient(): CdpClient {
 
 /**
  * Estimate swap price
- * 
+ *
  * Provides quick estimates for UI displays, real-time rates, and liquidity checks.
  * Does NOT reserve funds and may be less precise than creating a swap quote.
  * Suitable for frequent price updates.
- * 
+ *
  * @param params Swap parameters
  * @returns Price estimate with output amounts and liquidity status
- * 
+ *
  * @example
  * ```typescript
  * const estimate = await estimateSwapPrice({
@@ -185,9 +185,7 @@ function getCdpClient(): CdpClient {
  * });
  * ```
  */
-export async function estimateSwapPrice(
-  params: SwapPriceParams
-): Promise<SwapPriceEstimate> {
+export async function estimateSwapPrice(params: SwapPriceParams): Promise<SwapPriceEstimate> {
   validateNetwork(params.network)
 
   try {
@@ -202,23 +200,21 @@ export async function estimateSwapPrice(
 
     // Call our backend API which handles CDP authentication
     const response = await fetch(`/api/swap?${queryParams.toString()}`, {
-      method: 'GET',
-      cache: 'no-store' // Always get fresh prices
+      method: "GET",
+      cache: "no-store" // Always get fresh prices
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      throw new Error(
-        errorData.message || `Failed to get price estimate: ${response.status}`
-      )
+      throw new Error(errorData.message || `Failed to get price estimate: ${response.status}`)
     }
 
     const priceData = await response.json()
 
     // Return formatted price estimate
     return {
-      toAmount: BigInt(priceData.toAmount || '0'),
-      minToAmount: BigInt(priceData.minToAmount || '0'),
+      toAmount: BigInt(priceData.toAmount || "0"),
+      minToAmount: BigInt(priceData.minToAmount || "0"),
       liquidityAvailable: priceData.liquidityAvailable !== false
     }
   } catch (error) {
@@ -231,15 +227,15 @@ export async function estimateSwapPrice(
 
 /**
  * Create a swap quote
- * 
+ *
  * Provides transaction data needed for execution. More precise than price estimation.
  * May reserve funds onchain and is strictly rate-limited.
  * Use this when ready to commit to a swap.
- * 
+ *
  * @param account CDP account instance (EOA or Smart Account)
  * @param params Swap quote parameters
  * @returns Swap quote with execution method
- * 
+ *
  * @example
  * ```typescript
  * const account = await cdp.evm.getOrCreateAccount({ name: "MyAccount" });
@@ -291,14 +287,14 @@ export async function createSwapQuote(
 
 /**
  * Execute a swap using CDP account
- * 
+ *
  * All-in-one method that creates a quote and executes it in a single call.
  * Convenient for simple swap operations.
- * 
+ *
  * @param account CDP account instance (EOA or Smart Account)
  * @param params Swap parameters
  * @returns Execution result with transaction or user operation hash
- * 
+ *
  * @example
  * ```typescript
  * const account = await cdp.evm.getOrCreateAccount({ name: "MyAccount" });
@@ -342,14 +338,14 @@ export async function executeSwap(
 
 /**
  * Wait for user operation completion (Smart Accounts only)
- * 
+ *
  * After executing a swap with a Smart Account, wait for the user operation
  * to be mined and confirmed onchain.
- * 
+ *
  * @param account CDP Smart Account instance
  * @param userOpHash User operation hash from swap execution
  * @returns Receipt with transaction hash and status
- * 
+ *
  * @example
  * ```typescript
  * const result = await executeSwap(smartAccount, swapParams);
@@ -387,16 +383,14 @@ export async function waitForUserOperation(
 
 /**
  * Get swap transaction data for external wallets (client-side)
- * 
+ *
  * For use with external wallets (e.g., Dynamic.xyz, MetaMask, etc.)
  * Calls the API endpoint which handles CDP authentication server-side
- * 
+ *
  * @param params Swap parameters including taker address
  * @returns Transaction data ready to be sent
  */
-export async function getSwapTransaction(
-  params: SwapParams & { taker: string }
-): Promise<{
+export async function getSwapTransaction(params: SwapParams & { taker: string }): Promise<{
   to: string
   data: string
   value: string
@@ -443,9 +437,9 @@ export async function getSwapTransaction(
 
 /**
  * Execute swap with external wallet (Dynamic.xyz, MetaMask, etc.)
- * 
+ *
  * Gets transaction data from CDP and sends it using the provided wallet
- * 
+ *
  * @param walletProvider Wallet provider from Dynamic.xyz or other wallet
  * @param walletAddress User's wallet address
  * @param params Swap parameters
@@ -490,11 +484,11 @@ export async function executeSwapWithExternalWallet(
 
 /**
  * Get or create a CDP account
- * 
+ *
  * Helper function to get an existing account or create a new one.
- * NOTE: This requires CDP API credentials. Use executeSwapWithExternalWallet 
+ * NOTE: This requires CDP API credentials. Use executeSwapWithExternalWallet
  * for external wallets (Dynamic.xyz, MetaMask, etc.)
- * 
+ *
  * @param accountName Unique name for the account
  * @returns CDP account instance
  */
@@ -512,18 +506,16 @@ export async function getOrCreateAccount(accountName: string): Promise<Account> 
 
 /**
  * Get or create a Smart Account
- * 
+ *
  * Helper function to get an existing Smart Account or create a new one.
  * Smart Accounts support gas sponsorship, batch operations, and enhanced security.
  * NOTE: This requires CDP API credentials. Use executeSwapWithExternalWallet
  * for external wallets (Dynamic.xyz, MetaMask, etc.)
- * 
+ *
  * @param accountName Unique name for the account
  * @returns CDP Smart Account instance
  */
-export async function getOrCreateSmartAccount(
-  accountName: string
-): Promise<Account> {
+export async function getOrCreateSmartAccount(accountName: string): Promise<Account> {
   try {
     const cdp = getCdpClient()
     // Smart Accounts are created the same way as regular accounts
@@ -536,4 +528,3 @@ export async function getOrCreateSmartAccount(
     )
   }
 }
-

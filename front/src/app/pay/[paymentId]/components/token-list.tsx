@@ -1,7 +1,7 @@
 import { Loader2, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { calculateTokenAmount } from "@/services/dune-sim"
 import type { TokenBalance } from "@/services/dune-sim"
+import { calculateTokenAmount } from "@/services/dune-sim"
 import { TokenOption } from "./token-option"
 
 interface TokenListProps {
@@ -65,4 +65,3 @@ export function TokenList({
     </div>
   )
 }
-

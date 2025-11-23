@@ -12,7 +12,14 @@ interface WalletHeaderProps {
   onSwap?: () => void
 }
 
-export function WalletHeader({ totalValueUSD, loading, dollarPrice, onSend, onReceive }: WalletHeaderProps) {
+export function WalletHeader({
+  totalValueUSD,
+  loading,
+  dollarPrice,
+  onSend,
+  onReceive,
+  onSwap
+}: WalletHeaderProps) {
   return (
     <Card>
       <CardContent>
@@ -23,10 +30,14 @@ export function WalletHeader({ totalValueUSD, loading, dollarPrice, onSend, onRe
               <Skeleton className="h-10 w-40" />
             ) : (
               <p className="text-3xl font-heading font-bold">
-                ${totalValueUSD.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                $
+                {totalValueUSD.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
               </p>
             )}
-          </div>  
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="default"
@@ -82,4 +93,3 @@ export function WalletHeader({ totalValueUSD, loading, dollarPrice, onSend, onRe
     </Card>
   )
 }
-

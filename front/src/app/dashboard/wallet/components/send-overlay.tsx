@@ -1,10 +1,11 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import { ArrowUpRight, Check, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { isAddress } from "viem"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { TokenBalance } from "@/services/dune-sim"
@@ -68,7 +68,11 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
       return
     }
 
-    if (!recipientAddress || typeof recipientAddress !== "string" || recipientAddress.trim() === "") {
+    if (
+      !recipientAddress ||
+      typeof recipientAddress !== "string" ||
+      recipientAddress.trim() === ""
+    ) {
       setError("Please enter a recipient address")
       return
     }
@@ -79,7 +83,7 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
         setError("Please enter a valid recipient address")
         return
       }
-    } catch (err) {
+    } catch (_err) {
       setError("Please enter a valid recipient address")
       return
     }
@@ -91,7 +95,9 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
 
     const tokenBalance = Number(selectedToken.amount) / 10 ** selectedToken.decimals
     if (Number(amount) > tokenBalance) {
-      setError(`Insufficient balance. Available: ${tokenBalance.toFixed(6)} ${selectedToken.symbol}`)
+      setError(
+        `Insufficient balance. Available: ${tokenBalance.toFixed(6)} ${selectedToken.symbol}`
+      )
       return
     }
 
@@ -110,7 +116,8 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
       }
 
       const isNativeToken =
-        !selectedToken.address || selectedToken.address === "0x0000000000000000000000000000000000000000"
+        !selectedToken.address ||
+        selectedToken.address === "0x0000000000000000000000000000000000000000"
 
       console.log("Sending transaction:", {
         amount,
@@ -124,13 +131,15 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
       // Try to switch network if needed
       if (primaryWallet.connector?.switchNetwork && selectedToken.chain_id) {
         try {
-          console.log(`Attempting to switch to network ${selectedToken.chain} (Chain ID: ${selectedToken.chain_id})`)
+          console.log(
+            `Attempting to switch to network ${selectedToken.chain} (Chain ID: ${selectedToken.chain_id})`
+          )
           await primaryWallet.connector.switchNetwork({
             networkChainId: selectedToken.chain_id
           })
           console.log("Network switched successfully")
           // Small delay to let the wallet update
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise((resolve) => setTimeout(resolve, 500))
         } catch (switchError) {
           console.warn("Failed to switch network automatically:", switchError)
           // Don't throw here - let the sendBalance attempt proceed
@@ -153,36 +162,36 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
         })
       } catch (sendError) {
         console.error("sendBalance error:", sendError)
-        
+
         // Provide more specific error messages
         const errorMessage = sendError instanceof Error ? sendError.message : String(sendError)
-        
+
         if (errorMessage.includes("Failed to fetch") || errorMessage.includes("fetch")) {
           throw new Error(
             "Network connection failed. Please check your internet connection and try again."
           )
         }
-        
+
         if (errorMessage.includes("User rejected") || errorMessage.includes("user rejected")) {
           throw new Error("Transaction was rejected. Please try again if you want to proceed.")
         }
-        
+
         if (errorMessage.includes("insufficient funds")) {
           throw new Error("Insufficient funds to complete this transaction (including gas fees).")
         }
-        
+
         if (errorMessage.includes("gas required exceeds allowance")) {
           throw new Error(
             `Wrong network. This token is on ${selectedToken.chain} (Chain ID: ${selectedToken.chain_id}). Please switch your wallet to the correct network manually and try again.`
           )
         }
-        
+
         if (errorMessage.includes("chain mismatch") || errorMessage.includes("wrong chain")) {
           throw new Error(
             `Network mismatch. Please switch your wallet to ${selectedToken.chain} (Chain ID: ${selectedToken.chain_id}).`
           )
         }
-        
+
         // Re-throw with original message if no specific case matched
         throw new Error(`Transaction failed: ${errorMessage}`)
       }
@@ -245,7 +254,11 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
                     variant="neutral"
                     size="sm"
                     onClick={() => {
-                      window.open(`https://etherscan.io/tx/${txHash}`, "_blank", "noopener,noreferrer")
+                      window.open(
+                        `https://etherscan.io/tx/${txHash}`,
+                        "_blank",
+                        "noopener,noreferrer"
+                      )
                     }}
                     className="gap-2"
                   >
@@ -267,7 +280,9 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
                   ) : (
                     availableTokens.map((token) => {
                       const balance = formatTokenAmount(token.amount, token.decimals)
-                      const isSelected = selectedToken?.address === token.address && selectedToken?.chain_id === token.chain_id
+                      const isSelected =
+                        selectedToken?.address === token.address &&
+                        selectedToken?.chain_id === token.chain_id
 
                       return (
                         <button
@@ -291,7 +306,9 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
                               />
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center">
-                                <span className="text-xs font-bold">{token.symbol.slice(0, 2)}</span>
+                                <span className="text-xs font-bold">
+                                  {token.symbol.slice(0, 2)}
+                                </span>
                               </div>
                             )}
                             <div className="flex-1">
@@ -300,9 +317,7 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
                                 Balance: {balance} {token.symbol}
                               </p>
                             </div>
-                            {isSelected && (
-                              <Check className="h-5 w-5 text-[#00D696]" />
-                            )}
+                            {isSelected && <Check className="h-5 w-5 text-[#00D696]" />}
                           </div>
                         </button>
                       )
@@ -403,4 +418,3 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
     </Dialog>
   )
 }
-

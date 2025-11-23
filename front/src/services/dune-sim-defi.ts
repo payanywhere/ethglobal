@@ -11,7 +11,7 @@ export interface DefiPosition {
   chain_id: number
   usd_value: number
   logo?: string | null
-  
+
   // Common fields
   token_type?: string // For Tokenized positions (e.g., "AtokenV2")
   token?: string
@@ -19,13 +19,13 @@ export interface DefiPosition {
   token_symbol?: string
   calculated_balance?: number
   price_in_usd?: number
-  
+
   // ERC4626 specific
   underlying_token?: string
   underlying_token_name?: string
   underlying_token_symbol?: string
   underlying_token_decimals?: number
-  
+
   // UniswapV2/AMM specific
   protocol?: string
   pool?: string
@@ -40,7 +40,7 @@ export interface DefiPosition {
   token1_decimals?: number
   token1_price?: number
   lp_balance?: string
-  
+
   // NFT positions
   positions?: Array<{
     tick_lower: number
@@ -108,13 +108,18 @@ export async function fetchDefiPositions(
  */
 export function isAaveToken(position: DefiPosition): boolean {
   if (position.type !== "Tokenized") return false
-  
+
   const tokenType = position.token_type?.toLowerCase() || ""
   const symbol = position.token_symbol?.toLowerCase() || ""
-  
+
   return (
     tokenType.includes("atoken") ||
-    symbol.startsWith("a") && (symbol.includes("weth") || symbol.includes("wbtc") || symbol.includes("usdc") || symbol.includes("usdt") || symbol.includes("dai"))
+    (symbol.startsWith("a") &&
+      (symbol.includes("weth") ||
+        symbol.includes("wbtc") ||
+        symbol.includes("usdc") ||
+        symbol.includes("usdt") ||
+        symbol.includes("dai")))
   )
 }
 
@@ -125,20 +130,20 @@ export function formatPositionName(position: DefiPosition): string {
   switch (position.type) {
     case "Erc4626":
       return `${position.token_symbol || "Vault"} (${position.underlying_token_symbol || "Unknown"})`
-    
+
     case "Tokenized":
       if (isAaveToken(position)) {
         return `Aave ${position.token_symbol?.replace(/^a/, "") || "Token"}`
       }
       return position.token_symbol || "Lending Position"
-    
+
     case "UniswapV2":
       return `${position.token0_symbol || "?"}-${position.token1_symbol || "?"} LP`
-    
+
     case "Nft":
     case "NftV4":
       return `${position.token0_symbol || "?"}-${position.token1_symbol || "?"} V3 Position`
-    
+
     default:
       return "DeFi Position"
   }
@@ -166,7 +171,7 @@ export function getChainName(chainId: number): string {
  */
 export function getUnderlyingSymbolFromAaveToken(aaveSymbol: string): string | null {
   const symbol = aaveSymbol.toLowerCase()
-  
+
   // Remove common Aave prefixes
   if (symbol.startsWith("abnb")) {
     let underlying = symbol.substring(4) // "aBnbUSDT" -> "usdt"
@@ -192,7 +197,7 @@ export function getUnderlyingSymbolFromAaveToken(aaveSymbol: string): string | n
     }
     return underlying.toUpperCase() // "WETH", "USDT"
   }
-  
+
   return null
 }
 
@@ -227,8 +232,7 @@ export async function fetchAaveTokensFromBalances(
           symbol.includes("bnb"))) ||
       name.includes("aave interest bearing") ||
       name.includes("atoken") ||
-      name.toLowerCase().includes("aave") && name.toLowerCase().includes("usdt")
+      (name.toLowerCase().includes("aave") && name.toLowerCase().includes("usdt"))
     )
   })
 }
-

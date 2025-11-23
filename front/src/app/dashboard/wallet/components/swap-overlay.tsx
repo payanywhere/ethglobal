@@ -1,9 +1,10 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import { ArrowDownUp, ArrowLeftRight, Check, ChevronDown, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -11,21 +12,17 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { TokenBalance } from "@/services/dune-sim"
-import { formatTokenAmount } from "@/services/dune-sim"
+import { getTokensForNetwork, type TokenInfo } from "@/constants/cdp-tokens"
 import {
+  type CdpSupportedNetwork,
   estimateSwapPrice,
   getCdpNetwork,
-  isCdpSupportedChain,
-  type CdpSupportedNetwork
+  isCdpSupportedChain
 } from "@/services/cdp-trade"
-import {
-  getTokensForNetwork,
-  type TokenInfo
-} from "@/constants/cdp-tokens"
+import type { TokenBalance } from "@/services/dune-sim"
+import { formatTokenAmount } from "@/services/dune-sim"
 
 interface SwapOverlayProps {
   open: boolean
@@ -183,9 +180,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           }
         }
 
-        const fromAmount = BigInt(
-          Math.floor(Number(amount) * 10 ** selectedFromToken.decimals)
-        )
+        const fromAmount = BigInt(Math.floor(Number(amount) * 10 ** selectedFromToken.decimals))
 
         const estimate = await estimateSwapPrice({
           fromToken: fromTokenAddress,
@@ -208,7 +203,14 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
     // Debounce price estimation
     const timeoutId = setTimeout(estimatePrice, 500)
     return () => clearTimeout(timeoutId)
-  }, [selectedFromToken, selectedToToken, amount, currentNetwork, primaryWallet?.address, availableToTokens])
+  }, [
+    selectedFromToken,
+    selectedToToken,
+    amount,
+    currentNetwork,
+    primaryWallet?.address,
+    availableToTokens
+  ])
 
   const handleSwap = useCallback(async () => {
     if (!selectedFromToken || !selectedToToken || !currentNetwork) {
@@ -223,7 +225,9 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
     const tokenBalance = Number(selectedFromToken.amount) / 10 ** selectedFromToken.decimals
     if (Number(amount) > tokenBalance) {
-      setError(`Insufficient balance. Available: ${tokenBalance.toFixed(6)} ${selectedFromToken.symbol}`)
+      setError(
+        `Insufficient balance. Available: ${tokenBalance.toFixed(6)} ${selectedFromToken.symbol}`
+      )
       return
     }
 
@@ -256,9 +260,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
         }
       }
 
-      const fromAmount = BigInt(
-        Math.floor(Number(amount) * 10 ** selectedFromToken.decimals)
-      )
+      const fromAmount = BigInt(Math.floor(Number(amount) * 10 ** selectedFromToken.decimals))
 
       console.log("Executing swap:", {
         fromToken: fromTokenAddress,
@@ -270,51 +272,58 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
       // Switch to correct network if needed
       const targetChainId = currentNetwork === "base" ? 8453 : 1
-      
+
       if (primaryWallet.connector?.switchNetwork) {
         try {
-          console.log(`Attempting to switch to ${currentNetwork} network (Chain ID: ${targetChainId})`)
+          console.log(
+            `Attempting to switch to ${currentNetwork} network (Chain ID: ${targetChainId})`
+          )
           await primaryWallet.connector.switchNetwork({
             networkChainId: targetChainId
           })
           console.log("Network switched successfully")
           // Give the wallet time to update
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise((resolve) => setTimeout(resolve, 1000))
         } catch (switchError) {
           console.warn("Failed to switch network automatically:", switchError)
-          const switchErrorMsg = switchError instanceof Error ? switchError.message : String(switchError)
-          
+          const switchErrorMsg =
+            switchError instanceof Error ? switchError.message : String(switchError)
+
           // If user rejected, throw a clear error
           if (switchErrorMsg.includes("rejected") || switchErrorMsg.includes("denied")) {
             throw new Error(
               `You need to switch to ${currentNetwork === "base" ? "Base" : "Ethereum"} network to complete this swap. Please switch networks in your wallet and try again.`
             )
           }
-          
+
           // Otherwise continue - user might have already switched manually
           console.log("Continuing with transaction attempt...")
         }
       } else {
         // No automatic network switching available
         console.warn("Wallet does not support automatic network switching")
-        console.log(`Please ensure you are on ${currentNetwork} network (Chain ID: ${targetChainId})`)
+        console.log(
+          `Please ensure you are on ${currentNetwork} network (Chain ID: ${targetChainId})`
+        )
       }
-      
+
       // Verify we can connect to the wallet client before getting quote
       let walletClient
       try {
         walletClient = await primaryWallet.getWalletClient?.()
         if (!walletClient) {
-          throw new Error("Unable to connect to wallet. Please check your wallet connection and try again.")
+          throw new Error(
+            "Unable to connect to wallet. Please check your wallet connection and try again."
+          )
         }
         console.log("Wallet client connection verified")
       } catch (clientError) {
         console.error("Failed to get wallet client:", clientError)
         throw new Error(
           `Unable to connect to your wallet. Please:\n` +
-          `1. Make sure your wallet is unlocked\n` +
-          `2. Switch to ${currentNetwork === "base" ? "Base" : "Ethereum"} network manually in your wallet\n` +
-          `3. Refresh the page and try again`
+            `1. Make sure your wallet is unlocked\n` +
+            `2. Switch to ${currentNetwork === "base" ? "Base" : "Ethereum"} network manually in your wallet\n` +
+            `3. Refresh the page and try again`
         )
       }
 
@@ -375,93 +384,102 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
       // Check if token approval is needed (skip for native ETH)
       const isNativeEth = selectedFromToken.address === "0x0000000000000000000000000000000000000000"
       const PERMIT2_ADDRESS = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
-      
+
       if (!isNativeEth && walletClient && primaryWallet?.getPublicClient) {
         try {
           console.log("Checking Permit2 allowance for:", fromTokenAddress)
           setApprovingToken(true)
-          
+
           const publicClient = await primaryWallet.getPublicClient?.()
-          
+
           // ERC20 allowance ABI
-          const allowanceAbi = [{
-            name: 'allowance',
-            type: 'function',
-            stateMutability: 'view',
-            inputs: [
-              { name: 'owner', type: 'address' },
-              { name: 'spender', type: 'address' }
-            ],
-            outputs: [{ name: '', type: 'uint256' }]
-          }] as const
-          
+          const allowanceAbi = [
+            {
+              name: "allowance",
+              type: "function",
+              stateMutability: "view",
+              inputs: [
+                { name: "owner", type: "address" },
+                { name: "spender", type: "address" }
+              ],
+              outputs: [{ name: "", type: "uint256" }]
+            }
+          ] as const
+
           // Check current allowance for Permit2 contract
           const currentAllowance = await publicClient.readContract({
             address: fromTokenAddress as `0x${string}`,
             abi: allowanceAbi,
-            functionName: 'allowance',
+            functionName: "allowance",
             args: [primaryWallet.address as `0x${string}`, PERMIT2_ADDRESS as `0x${string}`]
           })
-          
+
           console.log("Current Permit2 allowance:", currentAllowance.toString())
           console.log("Required amount:", fromAmount.toString())
-          
+
           // If allowance is insufficient, request approval to Permit2
           if (currentAllowance < fromAmount) {
             console.log("Insufficient Permit2 allowance, requesting approval...")
-            
+
             // ERC20 approve ABI
-            const approveAbi = [{
-              name: 'approve',
-              type: 'function',
-              stateMutability: 'nonpayable',
-              inputs: [
-                { name: 'spender', type: 'address' },
-                { name: 'amount', type: 'uint256' }
-              ],
-              outputs: [{ name: '', type: 'bool' }]
-            }] as const
-            
+            const approveAbi = [
+              {
+                name: "approve",
+                type: "function",
+                stateMutability: "nonpayable",
+                inputs: [
+                  { name: "spender", type: "address" },
+                  { name: "amount", type: "uint256" }
+                ],
+                outputs: [{ name: "", type: "bool" }]
+              }
+            ] as const
+
             // Approve Permit2 contract to spend tokens
-            console.log(`Approving Permit2 contract (${PERMIT2_ADDRESS}) for ${fromAmount.toString()} tokens`)
-            
+            console.log(
+              `Approving Permit2 contract (${PERMIT2_ADDRESS}) for ${fromAmount.toString()} tokens`
+            )
+
             const approvalHash = await walletClient.writeContract({
               address: fromTokenAddress as `0x${string}`,
               abi: approveAbi,
-              functionName: 'approve',
+              functionName: "approve",
               args: [PERMIT2_ADDRESS as `0x${string}`, fromAmount],
               account: primaryWallet.address as `0x${string}`
             })
-            
+
             console.log("Approval transaction sent:", approvalHash)
-            
+
             // Wait for approval transaction to be confirmed
             console.log("Waiting for approval confirmation...")
             const approvalReceipt = await publicClient.waitForTransactionReceipt({
               hash: approvalHash,
               timeout: 60_000
             })
-            
-            if (approvalReceipt.status === 'reverted') {
+
+            if (approvalReceipt.status === "reverted") {
               throw new Error("Token approval failed. Please try again.")
             }
-            
+
             console.log("Permit2 approval confirmed!")
           } else {
             console.log("Sufficient Permit2 allowance already exists")
           }
-          
+
           setApprovingToken(false)
         } catch (approvalError) {
           setApprovingToken(false)
           console.error("Permit2 approval error:", approvalError)
-          
-          const approvalErrorMsg = approvalError instanceof Error ? approvalError.message : String(approvalError)
-          
+
+          const approvalErrorMsg =
+            approvalError instanceof Error ? approvalError.message : String(approvalError)
+
           if (approvalErrorMsg.includes("rejected") || approvalErrorMsg.includes("denied")) {
-            throw new Error("Permit2 approval was rejected. You need to approve Permit2 to proceed with the swap.")
+            throw new Error(
+              "Permit2 approval was rejected. You need to approve Permit2 to proceed with the swap."
+            )
           }
-          
+
           throw new Error(`Failed to approve Permit2: ${approvalErrorMsg}`)
         }
       }
@@ -472,21 +490,21 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
 
       try {
         console.log("Getting wallet clients for transaction...")
-        
+
         // Get Viem wallet client (works for all Dynamic wallet types)
         const walletClient = await primaryWallet.getWalletClient?.()
-        
+
         if (!walletClient) {
           throw new Error("Unable to get wallet client. Please reconnect your wallet.")
         }
 
         // Prepare transaction data (may need to append Permit2 signature)
         let transactionData = txData.data as `0x${string}`
-        
+
         // Handle Permit2 signature if needed
-        if (txData.permit2 && txData.permit2.eip712) {
+        if (txData.permit2?.eip712) {
           console.log("Signing Permit2 EIP-712 message...")
-          
+
           try {
             // Sign the Permit2 typed data
             const permit2Signature = await walletClient.signTypedData({
@@ -496,30 +514,33 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
               primaryType: txData.permit2.eip712.primaryType as string,
               message: txData.permit2.eip712.message as any
             })
-            
-            console.log("Permit2 signature obtained:", permit2Signature.substring(0, 20) + "...")
-            
+
+            console.log("Permit2 signature obtained:", `${permit2Signature.substring(0, 20)}...`)
+
             // Calculate signature length as 32-byte hex value
             const signatureBytes = permit2Signature.slice(2) // Remove 0x prefix
             const signatureLength = signatureBytes.length / 2 // Convert hex chars to bytes
-            const signatureLengthHex = signatureLength.toString(16).padStart(64, '0')
-            
+            const signatureLengthHex = signatureLength.toString(16).padStart(64, "0")
+
             // Append signature length and signature to transaction data
             // Format: originalData + signatureLength(32bytes) + signature
-            transactionData = `${transactionData}${signatureLengthHex}${signatureBytes}` as `0x${string}`
-            
+            transactionData =
+              `${transactionData}${signatureLengthHex}${signatureBytes}` as `0x${string}`
+
             console.log("Appended Permit2 signature to transaction data")
             console.log("Signature length:", signatureLength, "bytes")
           } catch (signError) {
             console.error("Failed to sign Permit2 message:", signError)
-            throw new Error("Failed to sign Permit2 approval. The swap requires your signature to proceed.")
+            throw new Error(
+              "Failed to sign Permit2 approval. The swap requires your signature to proceed."
+            )
           }
         } else {
           console.log("No Permit2 signature required")
         }
 
         console.log("Sending transaction via Dynamic walletClient...")
-        
+
         // Prepare transaction parameters
         const txParams = {
           account: primaryWallet.address as `0x${string}`,
@@ -528,26 +549,26 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           value: BigInt(txData.value),
           gas: txData.gasLimit ? BigInt(txData.gasLimit) : undefined
         }
-        
+
         console.log("Transaction params:", {
           to: txParams.to,
           value: txParams.value.toString(),
           gas: txParams.gas?.toString(),
           dataLength: txParams.data.length
         })
-        
+
         // Send transaction using Viem's sendTransaction
         // This works universally for all wallet types (embedded, external, etc.)
         txHash = await walletClient.sendTransaction(txParams)
-        
+
         console.log("Transaction sent successfully, hash:", txHash)
-        
+
         // Optionally get public client to wait for confirmation
         try {
           const publicClient = await primaryWallet.getPublicClient?.()
           if (publicClient) {
             console.log("Waiting for transaction confirmation...")
-            const receipt = await publicClient.waitForTransactionReceipt({ 
+            const receipt = await publicClient.waitForTransactionReceipt({
               hash: txHash,
               timeout: 60_000 // 60 seconds timeout
             })
@@ -559,24 +580,34 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
         }
       } catch (swapError) {
         console.error("Swap execution error:", swapError)
-        
+
         // Provide more specific error messages
         const errorMessage = swapError instanceof Error ? swapError.message : String(swapError)
-        
-        if (errorMessage.includes("User rejected") || errorMessage.includes("user rejected") || errorMessage.includes("denied")) {
+
+        if (
+          errorMessage.includes("User rejected") ||
+          errorMessage.includes("user rejected") ||
+          errorMessage.includes("denied")
+        ) {
           throw new Error("Transaction was rejected. Please try again if you want to proceed.")
         }
-        
-        if (errorMessage.includes("insufficient funds") || errorMessage.includes("insufficient balance")) {
+
+        if (
+          errorMessage.includes("insufficient funds") ||
+          errorMessage.includes("insufficient balance")
+        ) {
           throw new Error("Insufficient funds to complete this swap (including gas fees).")
         }
-        
-        if (errorMessage.includes("gas required exceeds allowance") || errorMessage.includes("gas required")) {
+
+        if (
+          errorMessage.includes("gas required exceeds allowance") ||
+          errorMessage.includes("gas required")
+        ) {
           throw new Error(
             `Wrong network or insufficient gas. Please switch your wallet to ${currentNetwork === "base" ? "Base" : "Ethereum"} network and try again.`
           )
         }
-        
+
         if (errorMessage.includes("chain mismatch") || errorMessage.includes("wrong chain")) {
           throw new Error(
             `Network mismatch. Please switch your wallet to ${currentNetwork} network.`
@@ -588,10 +619,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
             "Swap service not configured. Please contact support or check the CDP_SETUP.md file for configuration instructions."
           )
         }
-        
+
         // Network connectivity errors
         if (
-          errorMessage.includes("HTTP request failed") || 
+          errorMessage.includes("HTTP request failed") ||
           errorMessage.includes("Failed to fetch") ||
           errorMessage.includes("fetch failed") ||
           errorMessage.includes("network request") ||
@@ -600,32 +631,35 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
         ) {
           throw new Error(
             `Network connection error. The ${currentNetwork === "base" ? "Base" : "Ethereum"} RPC endpoint is not responding. Please:\n` +
-            `1. Check your internet connection\n` +
-            `2. Try switching your wallet to ${currentNetwork === "base" ? "Base" : "Ethereum"} network manually\n` +
-            `3. Wait a moment and try again\n` +
-            `4. If the issue persists, the network RPC might be experiencing issues`
+              `1. Check your internet connection\n` +
+              `2. Try switching your wallet to ${currentNetwork === "base" ? "Base" : "Ethereum"} network manually\n` +
+              `3. Wait a moment and try again\n` +
+              `4. If the issue persists, the network RPC might be experiencing issues`
           )
         }
-        
+
         // Chain ID errors
         if (errorMessage.includes("eth_chainId")) {
           throw new Error(
             `Unable to verify network. Please make sure your wallet is connected to ${currentNetwork === "base" ? "Base" : "Ethereum"} network and try again.`
           )
         }
-        
+
         // Execution reverted errors (on-chain failures)
-        if (errorMessage.includes("execution reverted") || errorMessage.includes("Transaction reverted")) {
+        if (
+          errorMessage.includes("execution reverted") ||
+          errorMessage.includes("Transaction reverted")
+        ) {
           throw new Error(
             "⚠️ Swap transaction failed on-chain. Common causes:\n\n" +
-            "1. 💱 Price Slippage - Price moved too much. Try increasing slippage tolerance\n" +
-            "2. ⏰ Quote Expired - The quote is stale. Close this modal and try again\n" +
-            "3. 💰 Insufficient Balance - Not enough tokens (including gas)\n" +
-            "4. ✅ Approval Issue - Token approval might have failed\n\n" +
-            "💡 Solution: Close this modal and start a fresh swap"
+              "1. 💱 Price Slippage - Price moved too much. Try increasing slippage tolerance\n" +
+              "2. ⏰ Quote Expired - The quote is stale. Close this modal and try again\n" +
+              "3. 💰 Insufficient Balance - Not enough tokens (including gas)\n" +
+              "4. ✅ Approval Issue - Token approval might have failed\n\n" +
+              "💡 Solution: Close this modal and start a fresh swap"
           )
         }
-        
+
         // Re-throw with original message if no specific case matched
         throw new Error(`Swap failed: ${errorMessage}`)
       }
@@ -658,7 +692,10 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
     currentNetwork,
     primaryWallet?.address,
     onSuccess,
-    availableToTokens
+    availableToTokens,
+    primaryWallet.connector.switchNetwork,
+    primaryWallet.getPublicClient,
+    primaryWallet
   ])
 
   const handleMax = useCallback(() => {
@@ -688,12 +725,12 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
   // Filter available "to" tokens (exclude from token)
   const filteredToTokens = useMemo(() => {
     if (!selectedFromToken) return availableToTokens
-    
+
     // If from token is native ETH, exclude both ETH and WETH from "to" list
     if (selectedFromToken.address === "0x0000000000000000000000000000000000000000") {
       return availableToTokens.filter((token) => token.symbol !== "ETH" && token.symbol !== "WETH")
     }
-    
+
     // Otherwise, exclude token with same address
     return availableToTokens.filter(
       (token) => token.address.toLowerCase() !== selectedFromToken.address.toLowerCase()
@@ -703,18 +740,21 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
   const noSupportedTokens = availableFromTokens.length === 0
 
   // Wrap onOpenChange to prevent closing during swap operations
-  const handleOpenChange = useCallback((newOpen: boolean) => {
-    // Prevent closing if we're in the middle of a swap operation
-    if (!newOpen && (loading || approvingToken || isSwapping)) {
-      console.log("Preventing modal close - swap in progress")
-      return
-    }
-    onOpenChange(newOpen)
-  }, [onOpenChange, loading, approvingToken, isSwapping])
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      // Prevent closing if we're in the middle of a swap operation
+      if (!newOpen && (loading || approvingToken || isSwapping)) {
+        console.log("Preventing modal close - swap in progress")
+        return
+      }
+      onOpenChange(newOpen)
+    },
+    [onOpenChange, loading, approvingToken, isSwapping]
+  )
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent 
+      <DialogContent
         className="max-w-lg border border-border p-0 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -722,15 +762,17 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
           <div className="px-6 pt-6">
             <DialogTitle>Swap Tokens</DialogTitle>
             <DialogDescription>
-              Swap tokens on {currentNetwork === "base" ? "Base" : currentNetwork === "ethereum" ? "Ethereum" : "a supported network"}
+              Swap tokens on{" "}
+              {currentNetwork === "base"
+                ? "Base"
+                : currentNetwork === "ethereum"
+                  ? "Ethereum"
+                  : "a supported network"}
             </DialogDescription>
           </div>
         </DialogHeader>
 
-        <div 
-          className="space-y-6 px-6 pb-6 pt-2"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="space-y-6 px-6 pb-6 pt-2" onClick={(e) => e.stopPropagation()}>
           {success ? (
             <div className="space-y-4 text-center py-8">
               <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mx-auto">
@@ -763,8 +805,8 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
             <>
               {noSupportedTokens && (
                 <div className="rounded-base border border-border bg-secondary-background p-3 text-sm text-foreground/70">
-                  This wallet does not have tokens on Ethereum or Base. Add funds on a supported network
-                  to start swapping.
+                  This wallet does not have tokens on Ethereum or Base. Add funds on a supported
+                  network to start swapping.
                 </div>
               )}
 
@@ -778,7 +820,9 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       variant="neutral"
                       className="w-full justify-between h-auto p-3"
                       disabled={noSupportedTokens}
-                      onClick={() => !noSupportedTokens && setShowFromTokenList((openList) => !openList)}
+                      onClick={() =>
+                        !noSupportedTokens && setShowFromTokenList((openList) => !openList)
+                      }
                     >
                       {selectedFromToken ? (
                         <div className="flex items-center gap-3">
@@ -792,11 +836,15 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                             />
                           ) : (
                             <div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center">
-                              <span className="text-xs font-bold">{selectedFromToken.symbol.slice(0, 2)}</span>
+                              <span className="text-xs font-bold">
+                                {selectedFromToken.symbol.slice(0, 2)}
+                              </span>
                             </div>
                           )}
                           <div className="text-left">
-                            <p className="font-heading font-semibold text-sm">{selectedFromToken.symbol}</p>
+                            <p className="font-heading font-semibold text-sm">
+                              {selectedFromToken.symbol}
+                            </p>
                             <p className="text-xs text-foreground/50">
                               {selectedFromTokenBalance} {selectedFromToken.symbol}
                             </p>
@@ -808,7 +856,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
                     {showFromTokenList && (
-                      <div 
+                      <div
                         className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -828,9 +876,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                                   setShowFromTokenList(false)
                                 }}
                                 className={`w-full p-2 rounded-base transition-all text-left flex items-center gap-2 ${
-                                  isSelected
-                                    ? "bg-[#00D696]/10"
-                                    : "hover:bg-secondary-background"
+                                  isSelected ? "bg-[#00D696]/10" : "hover:bg-secondary-background"
                                 }`}
                               >
                                 {token.token_metadata?.logo ? (
@@ -843,11 +889,15 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                                   />
                                 ) : (
                                   <div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center">
-                                    <span className="text-xs font-bold">{token.symbol.slice(0, 2)}</span>
+                                    <span className="text-xs font-bold">
+                                      {token.symbol.slice(0, 2)}
+                                    </span>
                                   </div>
                                 )}
                                 <div className="flex-1">
-                                  <p className="font-heading font-semibold text-xs">{token.symbol}</p>
+                                  <p className="font-heading font-semibold text-xs">
+                                    {token.symbol}
+                                  </p>
                                   <p className="text-xs text-foreground/50">
                                     {balance} {token.symbol}
                                   </p>
@@ -908,7 +958,11 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       variant="neutral"
                       className="w-full justify-between h-auto p-3"
                       disabled={!currentNetwork || filteredToTokens.length === 0}
-                      onClick={() => currentNetwork && filteredToTokens.length > 0 && setShowToTokenList((openList) => !openList)}
+                      onClick={() =>
+                        currentNetwork &&
+                        filteredToTokens.length > 0 &&
+                        setShowToTokenList((openList) => !openList)
+                      }
                     >
                       {currentNetwork ? (
                         selectedToToken ? (
@@ -923,11 +977,15 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                               />
                             ) : (
                               <div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center">
-                                <span className="text-xs font-bold">{selectedToToken.symbol.slice(0, 2)}</span>
+                                <span className="text-xs font-bold">
+                                  {selectedToToken.symbol.slice(0, 2)}
+                                </span>
                               </div>
                             )}
                             <div className="text-left">
-                              <p className="font-heading font-semibold text-sm">{selectedToToken.symbol}</p>
+                              <p className="font-heading font-semibold text-sm">
+                                {selectedToToken.symbol}
+                              </p>
                               <p className="text-xs text-foreground/50">{selectedToToken.name}</p>
                             </div>
                           </div>
@@ -942,7 +1000,7 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
                     {showToTokenList && currentNetwork && filteredToTokens.length > 0 && (
-                      <div 
+                      <div
                         className="absolute z-10 w-full mt-1 bg-background border-2 border-border rounded-base shadow-lg max-h-64 overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -972,11 +1030,15 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                                   />
                                 ) : (
                                   <div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center">
-                                    <span className="text-xs font-bold">{token.symbol.slice(0, 2)}</span>
+                                    <span className="text-xs font-bold">
+                                      {token.symbol.slice(0, 2)}
+                                    </span>
                                   </div>
                                 )}
                                 <div className="flex-1">
-                                  <p className="font-heading font-semibold text-xs">{token.symbol}</p>
+                                  <p className="font-heading font-semibold text-xs">
+                                    {token.symbol}
+                                  </p>
                                   <p className="text-xs text-foreground/50">{token.name}</p>
                                 </div>
                                 {isSelected && <Check className="h-4 w-4 text-[#00D696]" />}
@@ -1016,7 +1078,9 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                 <div className="p-3 rounded-base border border-border bg-secondary-background space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-foreground/50">Minimum Output (1% slippage)</span>
-                    <span className="font-medium">{minOutput} {selectedToToken.symbol}</span>
+                    <span className="font-medium">
+                      {minOutput} {selectedToToken.symbol}
+                    </span>
                   </div>
                   {!priceEstimate.liquidityAvailable && (
                     <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
@@ -1061,14 +1125,14 @@ export function SwapOverlay({ open, onOpenChange, tokens, onSuccess }: SwapOverl
                 onClick={handleSwap}
                 disabled={Boolean(
                   loading ||
-                  approvingToken ||
-                  !selectedFromToken ||
-                  !selectedToToken ||
-                  !amount ||
-                  !currentNetwork ||
-                  !primaryWallet?.address ||
-                  estimatingPrice ||
-                  (priceEstimate && priceEstimate.liquidityAvailable === false)
+                    approvingToken ||
+                    !selectedFromToken ||
+                    !selectedToToken ||
+                    !amount ||
+                    !currentNetwork ||
+                    !primaryWallet?.address ||
+                    estimatingPrice ||
+                    (priceEstimate && priceEstimate.liquidityAvailable === false)
                 )}
                 className="w-full gap-2"
               >

@@ -1,10 +1,10 @@
-import { Coins, Loader2, Sparkles, Wallet } from "lucide-react"
+import type { Variants } from "framer-motion"
 import { motion } from "framer-motion"
+import { Coins, Loader2, Sparkles, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { appKit } from "@/lib/reown-config"
 import type { TokenBalance } from "@/services/dune-sim"
-import type { Variants } from "framer-motion"
 import { TokenList } from "./token-list"
 import { WalletInfo } from "./wallet-info"
 
@@ -110,4 +110,3 @@ export function CryptoPaymentCard({
     </motion.div>
   )
 }
-

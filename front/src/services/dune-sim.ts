@@ -138,7 +138,7 @@ export function calculateTokenAmount(
  */
 export function formatTokenAmount(amount: string, decimals: number): string {
   const value = Number(amount) / 10 ** decimals
-  
+
   // Format large numbers with commas
   if (value >= 1000) {
     return value.toLocaleString("en-US", {
@@ -146,7 +146,7 @@ export function formatTokenAmount(amount: string, decimals: number): string {
       minimumFractionDigits: 2
     })
   }
-  
+
   // Format smaller numbers with more precision
   if (value >= 1) {
     return value.toLocaleString("en-US", {
@@ -154,7 +154,7 @@ export function formatTokenAmount(amount: string, decimals: number): string {
       minimumFractionDigits: 2
     })
   }
-  
+
   // Format very small numbers with more precision
   return value.toLocaleString("en-US", {
     maximumFractionDigits: 6,

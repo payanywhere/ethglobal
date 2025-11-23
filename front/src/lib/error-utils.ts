@@ -27,4 +27,3 @@ export function getFriendlyErrorMessage(error: unknown): string {
 
   return message || "Unexpected error. Please try again."
 }
-

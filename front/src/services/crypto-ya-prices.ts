@@ -6,11 +6,11 @@
 
 /**
  * Fetch dollar prices from CryptoYa
- * @returns crypto dollar bid price 
+ * @returns crypto dollar bid price
  */
 export async function fetchDollarPrice(): Promise<number> {
   try {
-    const response = await fetch('https://criptoya.com/api/dolar', {
+    const response = await fetch("https://criptoya.com/api/dolar", {
       cache: "no-store", // Always get fresh prices
       headers: {
         Accept: "application/json"
@@ -25,7 +25,7 @@ export async function fetchDollarPrice(): Promise<number> {
     }
 
     const data = await response.json()
-    return data?.cripto?.usdt?.bid ?? 0;
+    return data?.cripto?.usdt?.bid ?? 0
   } catch (error) {
     console.error("Error fetching prices from CryptoYa:", error)
     return 0

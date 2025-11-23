@@ -1,7 +1,7 @@
-import { ArrowDownToLine, ArrowUpRight, ExternalLink, Loader2 } from "lucide-react"
 import { format } from "date-fns"
+import { ArrowDownToLine, ArrowUpRight, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Transaction } from "../hooks/use-wallet-transactions"
 
 interface TransactionHistoryProps {
@@ -130,7 +130,7 @@ export function TransactionHistory({
           {transactions.map((tx) => {
             const isReceive = tx.type === "receive"
             const formattedValue = tx.token
-              ? (Number(tx.value) / Math.pow(10, tx.token.decimals)).toFixed(6)
+              ? (Number(tx.value) / 10 ** tx.token.decimals).toFixed(6)
               : (Number(tx.value) / 1e18).toFixed(6)
             const symbol = tx.token?.symbol || "ETH"
 
@@ -168,7 +168,11 @@ export function TransactionHistory({
                         {formattedValue} {symbol}
                       </p>
                       <p className="text-sm text-foreground/50">
-                        {tx.status === "pending" ? "Pending" : tx.status === "failed" ? "Failed" : "Confirmed"}
+                        {tx.status === "pending"
+                          ? "Pending"
+                          : tx.status === "failed"
+                            ? "Failed"
+                            : "Confirmed"}
                       </p>
                     </div>
                   </div>
@@ -189,4 +193,3 @@ export function TransactionHistory({
     </Card>
   )
 }
-
