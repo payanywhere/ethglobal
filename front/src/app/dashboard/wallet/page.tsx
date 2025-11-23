@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { WalletHeader } from "./components/wallet-header"
 import { TokenBalancesList } from "./components/token-balances-list"
 import { TransactionHistory } from "./components/transaction-history"
@@ -9,11 +9,13 @@ import { SendOverlay } from "./components/send-overlay"
 import { useMerchantWallet } from "./hooks/use-merchant-wallet"
 import { useWalletBalances } from "./hooks/use-wallet-balances"
 import { useWalletTransactions } from "./hooks/use-wallet-transactions"
+import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 
 export default function WalletPage() {
   const { walletAddress, ready } = useMerchantWallet()
   const [showSendModal, setShowSendModal] = useState(false)
   const [showReceiveModal, setShowReceiveModal] = useState(false)
+  const [dollarPrice, setDollarPrice] = useState<number | null>(null);
 
   // Custom hooks
   const {
@@ -43,6 +45,12 @@ export default function WalletPage() {
   const handleReceive = useCallback(() => {
     setShowReceiveModal(true)
   }, [])
+
+  useEffect(() => {
+    fetchDollarPrice().then(price => {
+      setDollarPrice(price);
+    });
+  }, []);
 
   if (!ready) {
     return (
@@ -91,6 +99,7 @@ export default function WalletPage() {
         loading={loadingBalances}
         onSend={handleSend}
         onReceive={handleReceive}
+        dollarPrice={dollarPrice}
       />
 
       {/* Token Balances and Transaction History - Side by side on desktop */}
