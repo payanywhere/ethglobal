@@ -1,3 +1,5 @@
+import { parseUnits } from "viem"
+
 /**
  * Dune Sim API Service
  * Documentation: https://docs.sim.dune.com/evm/balances
@@ -160,4 +162,29 @@ export function formatTokenAmount(amount: string, decimals: number): string {
     maximumFractionDigits: 6,
     minimumFractionDigits: 0
   })
+}
+
+/**
+ * Convert a USD amount into smallest token units as bigint
+ */
+export function getTokenAmountInSmallestUnit(
+  token: TokenBalance,
+  amountUSD: number,
+  precision = 8
+): bigint {
+  if (!token.price_usd || token.price_usd === 0) {
+    return BigInt(0)
+  }
+
+  const decimals = typeof token.decimals === "number" ? token.decimals : 18
+  const tokensNeeded = amountUSD / token.price_usd
+
+  if (!Number.isFinite(tokensNeeded) || tokensNeeded <= 0) {
+    return BigInt(0)
+  }
+
+  const decimalsToUse = Math.min(decimals, precision)
+  const tokensNeededStr = tokensNeeded.toFixed(decimalsToUse)
+
+  return parseUnits(tokensNeededStr, decimals)
 }

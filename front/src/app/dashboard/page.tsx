@@ -32,7 +32,7 @@ export default function DashboardPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             merchant_id: "merchant01",
-            amount_usd: 10
+            amount_usd: 5
           })
         })
 

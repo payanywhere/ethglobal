@@ -4,8 +4,13 @@
 
 import stargatePools from "./stargate-pools.json";
 
+const destinationAddressEnv =
+  process.env.NEXT_PUBLIC_PAYANYWHERE_FEE_COMPOSER_ADDRESS ||
+  process.env.PAYANYWHERE_FEE_COMPOSER_ADDRESS ||
+  "";
+
 export const ENDPOINT_ID=30109;
-export const DESTINATION_ADDRESS=process.env.NEXT_PUBLIC_PAYANYWHERE_FEE_COMPOSER_ADDRESS || "";
+export const DESTINATION_ADDRESS=destinationAddressEnv;
 
 type StargatePool = {
   Chain: string;

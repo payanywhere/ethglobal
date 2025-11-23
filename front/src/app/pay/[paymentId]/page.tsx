@@ -3,9 +3,11 @@
 import { motion } from "framer-motion"
 import { useParams, useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
-import { useAccount, useDisconnect } from "wagmi"
+import { useAccount, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi"
+import { getChainName } from "@/constants/chains"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
-import { calculateTokenAmount } from "@/services/dune-sim"
+import { sendStargatePayment } from "@/lib/lz/send-stargate-payment"
+import { calculateTokenAmount, getTokenAmountInSmallestUnit } from "@/services/dune-sim"
 import { CryptoPaymentCard } from "./components/crypto-payment-card"
 import { ErrorMessage } from "./components/error-message"
 import { FiatPaymentCard } from "./components/fiat-payment-card"
@@ -25,6 +27,9 @@ export default function PaymentPage() {
   // Custom hooks
   const { payment, loading: loadingPayment, error: paymentError } = usePayment(paymentId)
   const { address, isConnected, chain } = useAccount()
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const { switchChainAsync } = useSwitchChain()
   const { disconnect } = useDisconnect()
 
   const {
@@ -88,31 +93,69 @@ export default function PaymentPage() {
   }, [payment])
 
   const payCrypto = useCallback(async () => {
-    if (!selectedToken || !payment || !address) return
+    if (!selectedToken || !payment || !address) {
+      return
+    }
+
+    if (!walletClient) {
+      setError("Wallet client is unavailable. Please reconnect your wallet.")
+      return
+    }
+
+    if (!publicClient) {
+      setError("Unable to access the public client. Please retry.")
+      return
+    }
+
+    if (!chain || chain.id !== selectedToken.chain_id) {
+      try {
+        if (!switchChainAsync) {
+          throw new Error("Switch chain functionality is unavailable in this wallet.")
+        }
+        await switchChainAsync({ chainId: selectedToken.chain_id })
+      } catch (switchError) {
+        console.error("Error switching networks:", switchError)
+        setError(
+          `Unable to switch network automatically. Please switch to ${getChainName(selectedToken.chain_id)} and try again.`
+        )
+        return
+      }
+    }
 
     try {
       setProcessing(true)
       setError(null)
 
       const { formattedAmount } = calculateTokenAmount(selectedToken, payment.amount_usd)
+      const amountLD = getTokenAmountInSmallestUnit(selectedToken, payment.amount_usd)
+
+      if (amountLD === BigInt(0)) {
+        throw new Error("Unable to determine the token amount required for this payment.")
+      }
 
       console.log("Processing payment:", {
         token: selectedToken.symbol,
         amount: formattedAmount,
-        paymentId: payment.payment_id
+        paymentId: payment.payment_id,
+        chainId: selectedToken.chain_id
       })
 
-      // Simulate processing
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const txHash = await sendStargatePayment({
+        account: address as `0x${string}`,
+        amountLD,
+        chainId: selectedToken.chain_id,
+        walletClient,
+        publicClient
+      })
 
-      // Redirect to success page
-      router.push(`/pay/confirmed?method=crypto&token=${selectedToken.symbol}`)
+      router.push(`/pay/confirmed?method=crypto&token=${selectedToken.symbol}&tx=${txHash}`)
     } catch (err) {
       console.error("Error processing crypto payment:", err)
       setError(getFriendlyErrorMessage(err))
+    } finally {
       setProcessing(false)
     }
-  }, [selectedToken, payment, address, router])
+  }, [selectedToken, payment, address, walletClient, publicClient, chain, router, switchChainAsync])
 
   // Memoize animation variants
   const containerVariants = useMemo(() => ANIMATION_VARIANTS.container, [])
