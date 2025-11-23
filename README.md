@@ -1,6 +1,6 @@
 # PayAnyWhere
 
-This repository contains the full source code for the **PayAnyWhere** project.
+This repository contains the full source code for the **PayAnyWhere** project
 
 **PayAnyWhere** is a hybrid payment platform designed to connect merchants, clients, and blockchain smart contracts.
 It enables seamless fiat and crypto payments for global events through a unified API, merchant dashboard, and client payment interface.
