@@ -26,6 +26,8 @@ This stitches swap, bridge, settlement, wallet, and yield layers into a single, 
 * [@raiseerco](https://github.com/raiseerco)
 * [@magehernan](https://github.com/magehernan)
 
+![Diagram](front/.doc/resources/diagram.png)
+
 ## Development Setup
 
 This project follows a **monorepo** architecture with four main components: **Backend**, **Frontend**, **Infrastructure**, and **Smart Contracts**.
