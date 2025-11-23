@@ -7,3 +7,12 @@ MP_ACCESS_TOKEN=TEST-....
 
 # Dynamic
 NEXT_PUBLIC_DYNAMIC_ENV_ID=your-dynamic-environment-id
+
+# Coinbase Developer Platform (CDP) SDK
+# Get these from https://portal.cdp.coinbase.com/
+# When you create an API key, you'll download a cdp_api_key.json file
+# Copy the "id" field to CDP_API_KEY_APPID
+# Copy the "privateKey" field to CDP_API_KEY_SECRET
+CDP_API_KEY_APPID=your-api-key-id-from-json
+CDP_API_KEY_SECRET=your-private-key-from-json
+CDP_WALLET_SECRET=your-wallet-secret

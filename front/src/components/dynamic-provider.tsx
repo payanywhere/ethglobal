@@ -109,7 +109,7 @@ export function DynamicProvider({ children }: { children: React.ReactNode }) {
                 symbol: "ETH"
               },
               networkId: 8453,
-              rpcUrls: ["https://mainnet.base.org"],
+              rpcUrls: ["https://base-rpc.publicnode.com"],
               vanityName: "Base"
             }
           ]
