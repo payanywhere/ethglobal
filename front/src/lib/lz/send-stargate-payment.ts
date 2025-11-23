@@ -247,9 +247,7 @@ export async function sendStargatePayment({
 
   // Determine the token receiver - use provided tokenReceiver or default to merchant
   const tokenReceiver =
-    _tokenReceiver && isAddress(_tokenReceiver)
-      ? (_tokenReceiver as Address)
-      : targetMerchant
+    _tokenReceiver && isAddress(_tokenReceiver) ? (_tokenReceiver as Address) : targetMerchant
 
   // 1. Build compose message payload expected by Composer (address)
   // Following Hardhat example: only encode the receiver address
