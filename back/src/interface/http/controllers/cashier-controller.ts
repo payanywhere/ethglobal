@@ -3,7 +3,8 @@ import {
   createCashierUseCase,
   getCashierByUuidUseCase,
   getCashierDetailsUseCase,
-  getCashiersByMerchantUseCase
+  getCashiersByMerchantUseCase,
+  getCashiersByMerchantAddressUseCase
 } from "../../../factories/use-case-factory"
 
 interface ErrorResponse {
@@ -62,6 +63,25 @@ export async function getCashiersByMerchant(
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error"
     res.status(500).json({ error: message })
+  }
+}
+
+export async function getCashiersByMerchantAddress(
+  req: Request,
+  res: Response<ErrorResponse | unknown>
+): Promise<void> {
+  try {
+    const { address } = req.params
+    const useCase = getCashiersByMerchantAddressUseCase()
+    const cashiers = await useCase.execute(address)
+    res.json(cashiers)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    if (message.includes("not found")) {
+      res.status(404).json({ error: message })
+    } else {
+      res.status(500).json({ error: message })
+    }
   }
 }
 

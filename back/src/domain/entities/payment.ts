@@ -7,6 +7,8 @@ export interface Payment {
   network: string
   status: "pending" | "consolidated" | "failed" // consolidated = paid
   txHash?: string
+  description?: string
+  email?: string
   createdAt: Date
   updatedAt: Date
 }

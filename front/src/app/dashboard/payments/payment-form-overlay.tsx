@@ -3,7 +3,7 @@
 import { Loader2, QrCode } from "lucide-react"
 import Image from "next/image"
 import QRCode from "qrcode"
-import { memo, useCallback, useState } from "react"
+import { memo, useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useMerchant } from "@/contexts/merchant-context"
+import { createPayment } from "@/services/api"
 
 interface PaymentFormOverlayProps {
   open: boolean
@@ -36,13 +38,53 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   onSuccess,
   merchantId
 }: PaymentFormOverlayProps) {
+  const {
+    walletAddress,
+    cashiers,
+    refreshCashiers,
+    isLoading: isLoadingContext,
+    merchant
+  } = useMerchant()
   const [amount, setAmount] = useState<number>(10)
   const [description, setDescription] = useState<string>("")
   const [email, setEmail] = useState<string>("")
+  const [selectedCashierId, setSelectedCashierId] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [qrImage, setQrImage] = useState<string>("")
   const [payment, setPayment] = useState<PaymentResponse | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      setError(null)
+    }
+  }, [open])
+
+  // Load cashiers when dialog opens - usar los del contexto o refrescarlos si es necesario
+  useEffect(() => {
+    if (!open) return
+    if (!walletAddress) {
+      console.warn(
+        "[PaymentFormOverlay] ⚠️ No hay walletAddress disponible cuando se abrió el diálogo"
+      )
+      setError("Dirección de wallet no disponible. Por favor, verifica tu conexión.")
+      return
+    }
+    if (cashiers.length === 0) {
+      refreshCashiers().catch((err) => {
+        setError("error loading cashiers")
+      })
+    } else if (!selectedCashierId) {
+      setSelectedCashierId(cashiers[0].uuid)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, walletAddress])
+
+  useEffect(() => {
+    if (cashiers.length > 0 && !selectedCashierId) {
+      setSelectedCashierId(cashiers[0].uuid)
+    }
+  }, [cashiers, selectedCashierId])
 
   // Reset form when dialog closes
   const handleClose = useCallback(() => {
@@ -50,6 +92,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
       setAmount(10)
       setDescription("")
       setEmail("")
+      setSelectedCashierId("")
       setError(null)
       setQrImage("")
       setPayment(null)
@@ -58,15 +101,46 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   }, [loading, onClose])
 
   // Create payment
-  const createPayment = useCallback(async () => {
+  const createPaymentHandler = useCallback(async () => {
     if (amount <= 0) {
       setError("Amount must be greater than 0")
       return
     }
+    if (!selectedCashierId) {
+      setError("Please select a cashier")
+      return
+    }
+    if (!merchant || !merchant.wallets || merchant.wallets.length === 0) {
+      setError("Merchant does not have wallets configured")
+      return
+    }
+
+    const firstWallet = merchant.wallets[0]
+    if (!firstWallet.tokens || firstWallet.tokens.length === 0) {
+      setError("Merchant wallet does not have tokens configured")
+      return
+    }
+    const network = firstWallet.network
+    const token = firstWallet.tokens[0]
 
     try {
       setLoading(true)
       setError(null)
+
+      // Crear pago en el backend
+      try {
+        await createPayment({
+          cashierId: selectedCashierId,
+          amount: amount,
+          token: token,
+          network: network,
+          description: description || undefined,
+          email: email || undefined
+        })
+      } catch (backendError) {
+        // Continue with the payment of Mercado Pago even if the backend fails
+        // to not block the user experience
+      }
 
       const res = await fetch("/api/payment/fiat", {
         method: "POST",
@@ -107,7 +181,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
     } finally {
       setLoading(false)
     }
-  }, [amount, description, email, merchantId])
+  }, [amount, description, email, merchantId, selectedCashierId, merchant])
 
   // Handle success and close
   const handleSuccess = useCallback(() => {
@@ -189,6 +263,39 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
               />
               <p className="text-sm text-foreground/50 font-base">
                 Customer email address for notifications
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cashier" className="text-base font-heading">
+                Cashier
+              </Label>
+              {isLoadingContext ? (
+                <div className="flex items-center gap-2 p-3 border-2 border-border rounded-base">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm text-foreground/50">Loading cashiers...</span>
+                </div>
+              ) : (
+                <select
+                  id="cashier"
+                  value={selectedCashierId}
+                  onChange={(e) => setSelectedCashierId(e.target.value)}
+                  disabled={loading || cashiers.length === 0}
+                  className="w-full px-3 py-2 text-base border-2 border-border rounded-base bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cashiers.length === 0 ? (
+                    <option value="">No cashiers available</option>
+                  ) : (
+                    cashiers.map((cashier) => (
+                      <option key={cashier.uuid} value={cashier.uuid}>
+                        {cashier.name || cashier.uuid}
+                      </option>
+                    ))
+                  )}
+                </select>
+              )}
+              <p className="text-sm text-foreground/50 font-base">
+                Select the cashier for this payment
               </p>
             </div>
           </div>
@@ -279,8 +386,8 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
                 Cancel
               </Button>
               <Button
-                onClick={createPayment}
-                disabled={loading || amount <= 0}
+                onClick={createPaymentHandler}
+                disabled={loading || amount <= 0 || !selectedCashierId}
                 variant="default"
                 className="flex-1 h-12 text-lg !font-heading !font-bold"
                 size="lg"

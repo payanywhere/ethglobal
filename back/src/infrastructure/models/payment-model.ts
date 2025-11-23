@@ -13,7 +13,9 @@ const PaymentSchema = new Schema<Payment>(
       enum: ["pending", "consolidated", "failed"],
       default: "pending"
     },
-    txHash: { type: String }
+    txHash: { type: String },
+    description: { type: String },
+    email: { type: String }
   },
 
   {
