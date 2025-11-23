@@ -17,6 +17,11 @@ steps:
       - NEXT_PUBLIC_BASE_URL=${_NEXT_PUBLIC_BASE_URL}
       - MP_PUBLIC_KEY=${_MP_PUBLIC_KEY}
       - MP_ACCESS_TOKEN=${_MP_ACCESS_TOKEN}
+      - NEXT_PUBLIC_DYNAMIC_ENV_ID=${_NEXT_PUBLIC_DYNAMIC_ENV_ID}
+      - CDP_API_KEY_APPID=${_CDP_API_KEY_APPID}
+      - CDP_API_KEY_SECRET=${_CDP_API_KEY_SECRET}
+      - CDP_WALLET_SECRET=${_CDP_WALLET_SECRET}
+      - PAYANYWHERE_FEE_COMPOSER_ADDRESS=${_PAYANYWHERE_FEE_COMPOSER_ADDRESS}
       - APP_ENV=${_APP_ENV}
     args:
       - -c
@@ -28,6 +33,11 @@ steps:
         echo "NEXT_PUBLIC_BASE_URL=${_NEXT_PUBLIC_BASE_URL}" >> .env
         echo "MP_PUBLIC_KEY=${_MP_PUBLIC_KEY}" >> .env
         echo "MP_ACCESS_TOKEN=${_MP_ACCESS_TOKEN}" >> .env
+        echo "NEXT_PUBLIC_DYNAMIC_ENV_ID=${_NEXT_PUBLIC_DYNAMIC_ENV_ID}" >> .env
+        echo "CDP_API_KEY_APPID=${_CDP_API_KEY_APPID}" >> .env
+        echo "CDP_API_KEY_SECRET=${_CDP_API_KEY_SECRET}" >> .env
+        echo "CDP_WALLET_SECRET=${_CDP_WALLET_SECRET}" >> .env
+        echo "PAYANYWHERE_FEE_COMPOSER_ADDRESS=${_PAYANYWHERE_FEE_COMPOSER_ADDRESS}" >> .env
         echo ".env generated:"
         cat .env
 
@@ -46,6 +56,11 @@ steps:
       '--build-arg', 'NEXT_PUBLIC_BASE_URL=${_NEXT_PUBLIC_BASE_URL}',
       '--build-arg', 'MP_PUBLIC_KEY=${_MP_PUBLIC_KEY}',
       '--build-arg', 'MP_ACCESS_TOKEN=${_MP_ACCESS_TOKEN}',
+      '--build-arg', 'NEXT_PUBLIC_DYNAMIC_ENV_ID=${_NEXT_PUBLIC_DYNAMIC_ENV_ID}',
+      '--build-arg', 'CDP_API_KEY_APPID=${_CDP_API_KEY_APPID}',
+      '--build-arg', 'CDP_API_KEY_SECRET=${_CDP_API_KEY_SECRET}',
+      '--build-arg', 'CDP_WALLET_SECRET=${_CDP_WALLET_SECRET}',
+      '--build-arg', 'PAYANYWHERE_FEE_COMPOSER_ADDRESS=${_PAYANYWHERE_FEE_COMPOSER_ADDRESS}',
       '.'
     ]
 
@@ -77,7 +92,12 @@ steps:
           NEXT_PUBLIC_ENVIRONMENT=${_APP_ENV},
           NEXT_PUBLIC_BASE_URL=${_NEXT_PUBLIC_BASE_URL},
           MP_PUBLIC_KEY=${_MP_PUBLIC_KEY},
-          MP_ACCESS_TOKEN=${_MP_ACCESS_TOKEN}
+          MP_ACCESS_TOKEN=${_MP_ACCESS_TOKEN},
+          NEXT_PUBLIC_DYNAMIC_ENV_ID=${_NEXT_PUBLIC_DYNAMIC_ENV_ID},
+          CDP_API_KEY_APPID=${_CDP_API_KEY_APPID},
+          CDP_API_KEY_SECRET=${_CDP_API_KEY_SECRET},
+          CDP_WALLET_SECRET=${_CDP_WALLET_SECRET},
+          PAYANYWHERE_FEE_COMPOSER_ADDRESS=${_PAYANYWHERE_FEE_COMPOSER_ADDRESS}
       - '--project'
       - '${_PROJECT_ID}'
 
