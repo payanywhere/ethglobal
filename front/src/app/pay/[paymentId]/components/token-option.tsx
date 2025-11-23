@@ -19,7 +19,8 @@ export const TokenOption = memo(function TokenOption({
 }: TokenOptionProps) {
   const balance = formatTokenAmount(token.amount, token.decimals)
   const isInsufficient = (token.value_usd || 0) < paymentAmount
-  const networkName = token.chain === "base" ? "Base" : token.chain === "ethereum" ? "Ethereum" : token.chain
+  const networkName =
+    token.chain === "base" ? "Base" : token.chain === "ethereum" ? "Ethereum" : token.chain
 
   return (
     <button
@@ -61,9 +62,7 @@ export const TokenOption = memo(function TokenOption({
           </div>
           <div className="flex justify-between text-xs text-foreground/50">
             <span>≈ ${paymentAmount.toFixed(2)}</span>
-            <span className={isInsufficient ? "text-red-500/80" : ""}>
-              Bal: {balance}
-            </span>
+            <span className={isInsufficient ? "text-red-500/80" : ""}>Bal: {balance}</span>
           </div>
         </div>
       </div>

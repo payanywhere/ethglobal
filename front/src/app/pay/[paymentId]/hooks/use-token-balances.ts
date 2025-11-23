@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useAccount } from "wagmi"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
-import {
-  fetchWalletBalances,
-  filterTokensWithSufficientBalance,
-  type TokenBalance
-} from "@/services/dune-sim"
+import { fetchWalletBalances, type TokenBalance } from "@/services/dune-sim"
 import type { PaymentDetails } from "../types"
 
 export function useTokenBalances(payment: PaymentDetails | null) {
@@ -53,18 +49,16 @@ export function useTokenBalances(payment: PaymentDetails | null) {
 
       // Filter out tokens with zero value, but show all tokens regardless of whether
       // they cover the full payment amount (user might want to see what they have)
-      let availableTokens = response.balances.filter(
-        (token) => (token.value_usd || 0) > 0
-      )
-      
+      const availableTokens = response.balances.filter((token) => (token.value_usd || 0) > 0)
+
       // Prioritize Base (8453) and Ethereum (1) tokens
       availableTokens.sort((a, b) => {
         const isABaseOrEth = a.chain_id === 8453 || a.chain_id === 1
         const isBBaseOrEth = b.chain_id === 8453 || b.chain_id === 1
-        
+
         if (isABaseOrEth && !isBBaseOrEth) return -1
         if (!isABaseOrEth && isBBaseOrEth) return 1
-        
+
         // Secondary sort by value (desc)
         return (b.value_usd || 0) - (a.value_usd || 0)
       })
