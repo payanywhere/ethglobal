@@ -3,13 +3,17 @@
 import { motion } from "framer-motion"
 import { useParams, useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useAccount, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi"
 import { parseUnits } from "viem"
+import { useAccount, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi"
 import { getChainName } from "@/constants/chains"
 import { getFriendlyErrorMessage } from "@/lib/error-utils"
 import { sendStargatePayment } from "@/lib/lz/send-stargate-payment"
-import { calculateTokenAmount, formatTokenAmount, getTokenAmountInSmallestUnit } from "@/services/dune-sim"
 import { getCdpNetwork } from "@/services/cdp-trade"
+import {
+  calculateTokenAmount,
+  formatTokenAmount,
+  getTokenAmountInSmallestUnit
+} from "@/services/dune-sim"
 import { CryptoPaymentCard } from "./components/crypto-payment-card"
 import { ErrorMessage } from "./components/error-message"
 import { FiatPaymentCard } from "./components/fiat-payment-card"
@@ -18,9 +22,9 @@ import { PaymentHeader } from "./components/payment-header"
 import { PaymentInfoBanner } from "./components/payment-info-banner"
 import { PaymentStatus } from "./components/payment-status"
 import { ANIMATION_VARIANTS } from "./constants"
+import { useCdpSwap } from "./hooks/use-cdp-swap"
 import { usePayment } from "./hooks/use-payment"
 import { useTokenBalances } from "./hooks/use-token-balances"
-import { useCdpSwap } from "./hooks/use-cdp-swap"
 
 // USDC Addresses
 const USDC_ADDRESSES = {
@@ -51,7 +55,12 @@ export default function PaymentPage() {
   } = useTokenBalances(payment)
 
   // CDP Swap Hook
-  const { getRequiredInputAmount, executeSwap, loading: swapLoading, status: swapStatus } = useCdpSwap()
+  const {
+    getRequiredInputAmount,
+    executeSwap,
+    loading: swapLoading,
+    status: _swapStatus
+  } = useCdpSwap()
 
   // Local state
   const [processing, setProcessing] = useState(false)
@@ -72,12 +81,14 @@ export default function PaymentPage() {
       }
 
       const network = getCdpNetwork(selectedToken.chain_id)
-      
+
       // Check if we need a swap:
       // 1. Supported network (Base/Eth)
       // 2. Not USDC (address check)
       const usdcAddress = network ? USDC_ADDRESSES[network] : ""
-      const isUSDC = selectedToken.address.toLowerCase() === usdcAddress.toLowerCase() || selectedToken.symbol === "USDC"
+      const isUSDC =
+        selectedToken.address.toLowerCase() === usdcAddress.toLowerCase() ||
+        selectedToken.symbol === "USDC"
 
       if (network && !isUSDC) {
         setIsQuoting(true)
@@ -94,10 +105,10 @@ export default function PaymentPage() {
             address: address,
             decimals: selectedToken.decimals
           })
-          
-          setSwapQuote({ 
-            amount, 
-            formatted: formatTokenAmount(amount.toString(), selectedToken.decimals) 
+
+          setSwapQuote({
+            amount,
+            formatted: formatTokenAmount(amount.toString(), selectedToken.decimals)
           })
         } catch (e) {
           console.error("Error getting swap quote:", e)
@@ -112,7 +123,7 @@ export default function PaymentPage() {
         setIsQuoting(false)
       }
     }
-    
+
     // Debounce slightly
     const timer = setTimeout(updateQuote, 500)
     return () => clearTimeout(timer)
@@ -209,32 +220,32 @@ export default function PaymentPage() {
           network,
           address
         })
-        
+
         console.log("Swap completed. Proceeding to payment...")
-        
+
         // 2. Execute Payment (Transfer USDC)
         // We use the intended payment amount (target USDC)
         const amountUSDC = parseUnits(payment.amount_usd.toFixed(6), 6)
-        
+
         // For Stargate payment, we now send USDC
         // We need to make sure sendStargatePayment handles USDC correctly
         // Note: sendStargatePayment assumes we are sending the token with valid OFT config
         // Since USDC is supported on Base/Eth, this should work.
-        
+
         const txHash = await sendStargatePayment({
           account: address as `0x${string}`,
           amountLD: amountUSDC,
           chainId: selectedToken.chain_id,
           walletClient,
-          publicClient,
+          publicClient
           // Important: The token to send is now USDC, not selectedToken
-          // sendStargatePayment infers token from chainId/config. 
+          // sendStargatePayment infers token from chainId/config.
           // Wait, sendStargatePayment uses getOFTAddressByChainId(chainId).
           // If we are on Base, it gets the OFT address for Base.
           // If the config in lz-config.ts points to USDC on Base, then fine.
           // If it points to something else, this might fail if we try to send USDC but it expects X.
           // Let's assume lz-config is correct for USDC or stablecoins.
-          // If sendStargatePayment is built to support "Pay with Any", it usually means 
+          // If sendStargatePayment is built to support "Pay with Any", it usually means
           // sending the token via LayerZero.
           // But here we swapped to USDC.
           // If the Stargate pool on Base is USDC, then perfect.
@@ -245,9 +256,8 @@ export default function PaymentPage() {
           // We should check if that address is USDC.
           // If we can't verify, we proceed with risk, but given the prompt, we assume USDC is the target.
         })
-        
+
         router.push(`/pay/confirmed?method=crypto&token=USDC&tx=${txHash}`)
-        
       } else {
         // Standard flow (Pay with selected token directly)
         const { formattedAmount } = calculateTokenAmount(selectedToken, payment.amount_usd)
@@ -281,15 +291,15 @@ export default function PaymentPage() {
       setProcessing(false)
     }
   }, [
-    selectedToken, 
-    payment, 
-    address, 
-    walletClient, 
-    publicClient, 
-    chain, 
-    router, 
-    switchChainAsync, 
-    swapQuote, 
+    selectedToken,
+    payment,
+    address,
+    walletClient,
+    publicClient,
+    chain,
+    router,
+    switchChainAsync,
+    swapQuote,
     executeSwap
   ])
 

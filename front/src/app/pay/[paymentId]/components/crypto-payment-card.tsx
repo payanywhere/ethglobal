@@ -89,7 +89,11 @@ export function CryptoPaymentCard({
                 <div className="p-3 rounded-base bg-secondary-background border border-border text-sm">
                   <p className="font-medium text-foreground/80">Swap Quote</p>
                   <p className="text-foreground/60">
-                    Pay <span className="font-bold text-foreground">{swapQuoteAmount} {selectedToken?.symbol}</span> (includes fees)
+                    Pay{" "}
+                    <span className="font-bold text-foreground">
+                      {swapQuoteAmount} {selectedToken?.symbol}
+                    </span>{" "}
+                    (includes fees)
                   </p>
                 </div>
               )}
