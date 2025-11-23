@@ -9,9 +9,13 @@ interface TokenBalanceItemProps {
   dollarPrice: number
 }
 
-export const TokenBalanceItem = memo(function TokenBalanceItem({ token, isARS, dollarPrice }: TokenBalanceItemProps) {
+export const TokenBalanceItem = memo(function TokenBalanceItem({
+  token,
+  isARS,
+  dollarPrice
+}: TokenBalanceItemProps) {
   const formattedAmount = formatTokenAmount(token.amount, token.decimals)
-  const value = isARS ? (Number(token.value_usd) * (dollarPrice ?? 0)) : token.value_usd || 0
+  const value = isARS ? Number(token.value_usd) * (dollarPrice ?? 0) : token.value_usd || 0
 
   return (
     <div className="group relative p-4 rounded-base border border-border bg-background hover:border-foreground/20 hover:shadow-sm transition-all duration-200">

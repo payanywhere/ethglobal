@@ -1,6 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { Switch } from "@/components/ui/switch"
+import { getCurrency, setCurrency } from "@/lib/currency"
 import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 import { ReceiveOverlay } from "./components/receive-overlay"
 import { SendOverlay } from "./components/send-overlay"
@@ -11,8 +13,6 @@ import { WalletHeader } from "./components/wallet-header"
 import { useMerchantWallet } from "./hooks/use-merchant-wallet"
 import { useWalletBalances } from "./hooks/use-wallet-balances"
 import { useWalletTransactions } from "./hooks/use-wallet-transactions"
-import { Switch } from "@/components/ui/switch"
-import { getCurrency, setCurrency } from "@/lib/currency"
 
 export default function WalletPage() {
   const { walletAddress, ready } = useMerchantWallet()
@@ -52,18 +52,18 @@ export default function WalletPage() {
   }, [])
 
   useEffect(() => {
-    fetchDollarPrice().then(price => {
-      setDollarPrice(price);
-    });
+    fetchDollarPrice().then((price) => {
+      setDollarPrice(price)
+    })
 
-    setIsARS(getCurrency() === "ARS");
-  }, []);
+    setIsARS(getCurrency() === "ARS")
+  }, [])
 
   useEffect(() => {
     if (isARS !== null) {
-      setCurrency(isARS ? "ARS" : "USD");
+      setCurrency(isARS ? "ARS" : "USD")
     }
-  }, [isARS]);
+  }, [isARS])
 
   const handleSwap = useCallback(() => {
     setShowSwapModal(true)
@@ -117,7 +117,7 @@ export default function WalletPage() {
         </div>
         <div className="flex items-center gap-2 mt-4 justify-end">
           <span>Currency:</span>
-          <Switch checked={isARS} onCheckedChange={setIsARS} />
+          <Switch checked={isARS ?? false} onCheckedChange={setIsARS} />
           <span>{isARS ? "ARS" : "USD"}</span>
         </div>
       </section>
@@ -130,7 +130,7 @@ export default function WalletPage() {
         onReceive={handleReceive}
         onSwap={handleSwap}
         dollarPrice={dollarPrice}
-        isARS={isARS}
+        isARS={isARS ?? false}
       />
 
       {/* Token Balances and Transaction History - Side by side on desktop */}
@@ -140,7 +140,7 @@ export default function WalletPage() {
           loading={loadingBalances}
           error={balancesError}
           onRefresh={refetchBalances}
-          isARS={isARS}
+          isARS={isARS ?? false}
           dollarPrice={dollarPrice ?? 0}
         />
         <TransactionHistory

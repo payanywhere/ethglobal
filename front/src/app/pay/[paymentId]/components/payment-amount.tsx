@@ -1,9 +1,9 @@
 "use client"
-import { getCurrency, setCurrency } from "@/lib/currency"
-import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 import type { Variants } from "framer-motion"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { getCurrency } from "@/lib/currency"
+import { fetchDollarPrice } from "@/services/crypto-ya-prices"
 
 interface PaymentAmountProps {
   amount: number
@@ -12,16 +12,16 @@ interface PaymentAmountProps {
 }
 
 export function PaymentAmount({ amount, paymentId, variants }: PaymentAmountProps) {
-  const [dollarPrice, setDollarPrice] = useState<number>(0);
-  const [isARS, setIsARS] = useState(false);
+  const [dollarPrice, setDollarPrice] = useState<number>(0)
+  const [isARS, setIsARS] = useState(false)
 
   useEffect(() => {
-    fetchDollarPrice().then(price => {
-      setDollarPrice(price);
-    });
+    fetchDollarPrice().then((price) => {
+      setDollarPrice(price)
+    })
 
-    setIsARS(getCurrency() === "ARS");
-  }, []);
+    setIsARS(getCurrency() === "ARS")
+  }, [])
 
   return (
     <motion.div variants={variants} className="text-center space-y-4">
