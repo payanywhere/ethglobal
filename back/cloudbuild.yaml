@@ -13,6 +13,7 @@ steps:
     dir: 'back'
     env:
       - APP_ENV=${_APP_ENV}
+      - PORT=${_PORT}
       - MONGO_URI=${_MONGO_URI}
       - RPC_PROVIDER=${_RPC_PROVIDER}
       - PRIVATE_KEY=${_PRIVATE_KEY}
@@ -22,6 +23,7 @@ steps:
         echo "Creating .env file..."
         echo "APP_ENV=${_APP_ENV}" > .env
         echo "NODE_ENV=production" >> .env
+        echo "PORT=${_PORT}" >> .env
         echo "MONGO_URI=${_MONGO_URI}" >> .env
         echo "RPC_PROVIDER=${_RPC_PROVIDER}" >> .env
         echo "PRIVATE_KEY=${_PRIVATE_KEY}" >> .env
@@ -40,6 +42,7 @@ steps:
       '-f', 'Dockerfile',
       '--build-arg', 'APP_ENV=${_APP_ENV}',
       '--build-arg', 'NODE_ENV=production',
+      '--build-arg', 'PORT=${_PORT}',
       '--build-arg', 'MONGO_URI=${_MONGO_URI}',
       '--build-arg', 'RPC_PROVIDER=${_RPC_PROVIDER}', 
       '--build-arg', 'PRIVATE_KEY=${_PRIVATE_KEY}',
@@ -81,6 +84,7 @@ steps:
           --set-env-vars '
             APP_ENV=${_APP_ENV},
             NODE_ENV=production,
+            PORT=${_PORT},
             MONGO_URI=${_MONGO_URI},
             RPC_PROVIDER=${_RPC_PROVIDER},
             PRIVATE_KEY=${_PRIVATE_KEY}

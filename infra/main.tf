@@ -105,11 +105,26 @@ resource "google_artifact_registry_repository" "front" {
 
 /*
 module "cicd" {
-  source             = "./modules/cicd"
-  project_id         = var.project_id
-  region             = var.region
-  repo_resource_path = "projects/payanywhere/locations/us-central1/connections/payanywhere-repo/repositories/payanywhere-ethglobal_temp"
-  mongo_uri          = var.mongo_uri
-  domain_name        = var.domain_name
+  source                        = "./modules/cicd"
+  project_id                    = var.project_id
+  region                        = var.region
+  repo_resource_path            = "projects/payanywhere/locations/us-central1/connections/payanywhere-repo/repositories/payanywhere-ethglobal_temp"
+  mongo_uri                     = var.mongo_uri
+  domain_name                   = var.domain_name
+  # Frontend Environment Variables
+  next_public_environment       = var.next_public_environment
+  next_public_api_url           = var.next_public_api_url
+  next_public_base_url          = var.next_public_base_url
+  mp_public_key                 = var.mp_public_key
+  mp_access_token               = var.mp_access_token
+  next_public_dynamic_env_id    = var.next_public_dynamic_env_id
+  cdp_api_key_appid             = var.cdp_api_key_appid
+  cdp_api_key_secret            = var.cdp_api_key_secret
+  cdp_wallet_secret             = var.cdp_wallet_secret
+  payanywhere_fee_composer_address = var.payanywhere_fee_composer_address
+  # Backend Environment Variables
+  rpc_provider                  = var.rpc_provider
+  private_key                   = var.private_key
+  port                          = var.port
 }
 */
