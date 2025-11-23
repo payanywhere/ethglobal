@@ -6,12 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 interface WalletHeaderProps {
   totalValueUSD: number
   loading?: boolean
+  dollarPrice?: number | null
   onSend?: () => void
   onReceive?: () => void
   onSwap?: () => void
 }
 
-export function WalletHeader({ totalValueUSD, loading, onSend, onReceive, onSwap }: WalletHeaderProps) {
+export function WalletHeader({ totalValueUSD, loading, dollarPrice, onSend, onReceive }: WalletHeaderProps) {
   return (
     <Card>
       <CardContent>
