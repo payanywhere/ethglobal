@@ -1,9 +1,10 @@
 "use client"
 
-import { Loader2, QrCode } from "lucide-react"
+import { Loader2, QrCode, Printer } from "lucide-react"
 import Image from "next/image"
 import QRCode from "qrcode"
 import { memo, useCallback, useEffect, useState } from "react"
+import { jsPDF } from "jspdf"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -26,12 +27,6 @@ interface PaymentFormOverlayProps {
   merchantId: string
 }
 
-interface PaymentResponse {
-  preference_id: string
-  init_point: string
-  sandbox_init_point?: string
-}
-
 export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   open,
   onClose,
@@ -52,7 +47,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [qrImage, setQrImage] = useState<string>("")
-  const [payment, setPayment] = useState<PaymentResponse | null>(null)
+  const [paymentData, setPaymentData] = useState<{ id: string, link: string } | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -88,7 +83,7 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
       setSelectedCashierId("")
       setError(null)
       setQrImage("")
-      setPayment(null)
+      setPaymentData(null)
       onClose()
     }
   }, [loading, onClose])
@@ -120,60 +115,65 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
       setLoading(true)
       setError(null)
 
-      try {
-        await createPayment({
-          cashierId: selectedCashierId,
-          amount: amount,
-          token: token,
-          network: network,
-          description: description || undefined,
-          email: email || undefined
-        })
-      } catch (backendError) {
-        // Continue with the payment of Mercado Pago even if the backend fails
-        // to not block the user experience
-      }
-
-      const res = await fetch("/api/payment/fiat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          merchant_id: merchantId,
-          amount_usd: amount,
-          description: description || `Purchase of $${amount} USD`,
-          email: email || undefined
-        })
+      const payment = await createPayment({
+        cashierId: selectedCashierId,
+        amount: amount,
+        token: token,
+        network: network,
+        description: description || undefined,
+        email: email || undefined
       })
 
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.error || "Failed to create payment")
-      }
+      const link = `${window.location.origin}/pay/${payment.cashierId}`
+      setPaymentData({ id: payment.id, link })
 
-      const data = await res.json()
-      setPayment(data)
+      const qr = await QRCode.toDataURL(link, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF"
+        }
+      })
+      setQrImage(qr)
 
-      if (data.init_point || data.sandbox_init_point) {
-        const initPoint = data.init_point || data.sandbox_init_point
-        const qr = await QRCode.toDataURL(initPoint, {
-          width: 300,
-          margin: 2,
-          color: {
-            dark: "#000000",
-            light: "#FFFFFF"
-          }
-        })
-        setQrImage(qr)
-      } else {
-        throw new Error("Missing payment URL in response")
-      }
     } catch (e) {
       console.error("Error creating payment", e)
       setError(e instanceof Error ? e.message : "An unexpected error occurred")
     } finally {
       setLoading(false)
     }
-  }, [amount, description, email, merchantId, selectedCashierId, merchant])
+  }, [amount, description, email, merchant, selectedCashierId])
+
+  const handleDownloadPdf = useCallback(() => {
+    if (!qrImage || !paymentData) return
+
+    const doc = new jsPDF()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    
+    // Title
+    doc.setFontSize(22)
+    doc.text("Pay here", pageWidth / 2, 25, { align: "center" })
+    
+    // QR Code
+    const qrSize = 120
+    const qrY = 55
+    doc.addImage(qrImage, "PNG", (pageWidth - qrSize) / 2, qrY, qrSize, qrSize)
+    
+    // Description
+    if (description) {
+      doc.setFontSize(14)
+      const descLines = doc.splitTextToSize(description, 160)
+      doc.text(descLines, pageWidth / 2, qrY + qrSize + 20, { align: "center" })
+    }
+    
+    // Footer Link
+    doc.setFontSize(10)
+    doc.setTextColor(100)
+    doc.text(paymentData.link, pageWidth / 2, 280, { align: "center" })
+
+    doc.save(`payment-${paymentData.id}.pdf`)
+  }, [qrImage, paymentData, amount, description])
 
   // Handle success and close
   const handleSuccess = useCallback(() => {
@@ -187,11 +187,11 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
         <DialogHeader>
           <DialogTitle>Create Payment</DialogTitle>
           <DialogDescription>
-            Generate a payment link using Mercado Pago (Sandbox Mode)
+            Generate a QR code to receive payment.
           </DialogDescription>
         </DialogHeader>
 
-        {!payment ? (
+        {!paymentData ? (
           <div className="space-y-6 py-4">
             {error && (
               <div className="p-4 rounded-base border-2 border-border bg-red-50 dark:bg-red-950 shadow-shadow">
@@ -297,10 +297,10 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center gap-6">
                   {qrImage && (
-                    <div className="p-6 rounded-base border-2 border-border bg-secondary-background shadow-shadow">
+                    <div className="p-6 rounded-base border-2 border-border bg-white shadow-shadow">
                       <Image
                         src={qrImage}
-                        alt="Mercado Pago QR Code"
+                        alt="Payment QR Code"
                         width={300}
                         height={300}
                         className="w-64 h-64 md:w-72 md:h-72"
@@ -321,21 +321,21 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
                         <p className="text-base font-base">{description}</p>
                       </div>
                     )}
+                    
+                    <div className="p-4 rounded-base border-2 border-border bg-secondary-background space-y-2 shadow-shadow">
+                       <p className="text-sm font-heading text-foreground/50">Payment Link</p>
+                       <p className="text-xs font-mono break-all text-foreground/70">{paymentData.link}</p>
+                    </div>
                   </div>
 
                   <Button
-                    asChild
+                    onClick={handleDownloadPdf}
                     variant="default"
                     size="lg"
                     className="w-full min-h-12 text-lg font-heading"
                   >
-                    <a
-                      href={payment.init_point || payment.sandbox_init_point}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Open Mercado Pago Checkout
-                    </a>
+                    <Printer className="w-5 h-5 mr-2" />
+                    Print / Download PDF
                   </Button>
                 </div>
               </CardContent>
@@ -344,11 +344,11 @@ export const PaymentFormOverlay = memo(function PaymentFormOverlay({
         )}
 
         <DialogFooter>
-          {payment ? (
+          {paymentData ? (
             <div className="flex gap-2 w-full">
               <Button
                 onClick={() => {
-                  setPayment(null)
+                  setPaymentData(null)
                   setQrImage("")
                 }}
                 variant="neutral"
