@@ -25,6 +25,12 @@ declare module "@dynamic-labs/sdk-react-core" {
           request?: (args: { method: string; params?: unknown[] }) => Promise<string>
         }>
         switchNetwork?: (params: { networkChainId: number }) => Promise<void>
+        sendTransaction?: (params: {
+          to: string
+          data?: string
+          value?: string
+          gas?: string
+        }) => Promise<string>
       }
       sendBalance?: (params: {
         amount: string
@@ -34,6 +40,14 @@ declare module "@dynamic-labs/sdk-react-core" {
           decimals: number
         }
       }) => Promise<string>
+      sendTransaction?: (params: {
+        to: string
+        data?: string
+        value?: string
+        gas?: string
+      }) => Promise<string>
+      getWalletClient?: () => Promise<any>
+      getPublicClient?: () => Promise<any>
     } | null
     isAuthenticated: boolean
     isAuthLoading: boolean

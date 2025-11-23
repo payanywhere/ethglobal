@@ -20,7 +20,8 @@ export const DEFI_SUPPORTED_CHAINS: ChainConfig[] = [
     name: "ethereum",
     chain_id: 1,
     tags: ["default", "mainnet"],
-    explorer_url: "https://etherscan.io"
+    explorer_url: "https://etherscan.io",
+    rpc_url: "https://eth.llamarpc.com"
   },
   {
     name: "optimism",
@@ -38,7 +39,8 @@ export const DEFI_SUPPORTED_CHAINS: ChainConfig[] = [
     name: "base",
     chain_id: 8453,
     tags: ["default"],
-    explorer_url: "https://basescan.org"
+    explorer_url: "https://basescan.org",
+    rpc_url: "https://base-rpc.publicnode.com"
   },
   {
     name: "mode",
@@ -179,5 +181,13 @@ export function isDefiSupportedChain(chainId: number): boolean {
  */
 export function getDefiSupportedChainIds(): number[] {
   return DEFI_SUPPORTED_CHAINS.map((chain) => chain.chain_id)
+}
+
+/**
+ * Get all known chain IDs (DeFi-supported + additional chains)
+ * Useful for balance lookups where we want broad coverage
+ */
+export function getAllChainIds(): number[] {
+  return ALL_CHAINS.map((chain) => chain.chain_id)
 }
 

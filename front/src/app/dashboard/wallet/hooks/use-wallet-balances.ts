@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { fetchWalletBalances, type TokenBalance } from "@/services/dune-sim"
 import {
   fetchDefiPositions,
@@ -8,7 +8,8 @@ import {
   getUnderlyingSymbolFromAaveToken,
   type DefiPosition
 } from "@/services/dune-sim-defi"
-import { isDefiSupportedChain } from "@/constants/chains"
+import { getAllChainIds, isDefiSupportedChain } from "@/constants/chains"
+import { BASE_TOKENS, ETHEREUM_TOKENS, type TokenInfo } from "@/constants/cdp-tokens"
 import { fetchTokenPrices, calculateUsdValue, searchTokenBySymbol } from "@/services/defillama-prices"
 
 /**
@@ -51,6 +52,18 @@ function defiPositionToTokenBalance(position: DefiPosition): TokenBalance {
 }
 
 export function useWalletBalances(address: string | null) {
+  const balanceChainIds = useMemo(() => getAllChainIds().join(","), [])
+  const knownTokenOverrides = useMemo(() => {
+    const map = new Map<string, TokenInfo>()
+    const register = (chainId: number, token: TokenInfo) => {
+      map.set(`${chainId}-${token.address.toLowerCase()}`, token)
+    }
+
+    ETHEREUM_TOKENS.forEach((token) => register(1, token))
+    BASE_TOKENS.forEach((token) => register(8453, token))
+
+    return map
+  }, [])
   const [balances, setBalances] = useState<TokenBalance[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -83,6 +96,7 @@ export function useWalletBalances(address: string | null) {
       // Fetch both regular balances and DeFi positions in parallel
       const [balancesResponse, defiResponse] = await Promise.all([
         fetchWalletBalances(address, {
+          chainIds: balanceChainIds,
           excludeSpamTokens: true,
           metadata: ["logo"],
           limit: 1000
@@ -94,7 +108,26 @@ export function useWalletBalances(address: string | null) {
       ])
 
       // Filter out ALL Aave tokens (we'll add them back separately) and tokens without logo
-      const regularBalances = balancesResponse.balances.filter((token) => {
+      const balancesWithOverrides = balancesResponse.balances.map((token) => {
+        const key = `${token.chain_id}-${token.address.toLowerCase()}`
+        const override = knownTokenOverrides.get(key)
+
+        if (!override) {
+          return token
+        }
+
+        return {
+          ...token,
+          symbol: token.symbol || override.symbol,
+          name: token.name || override.name,
+          token_metadata: {
+            ...token.token_metadata,
+            logo: token.token_metadata?.logo || override.logo
+          }
+        }
+      })
+
+      const regularBalances = balancesWithOverrides.filter((token) => {
         // Exclude ALL Aave tokens (we'll handle them separately)
         if (isAaveTokenBalance(token)) {
           return false
@@ -116,7 +149,7 @@ export function useWalletBalances(address: string | null) {
 
       // Get Aave tokens from non-DeFi-supported chains (e.g., Polygon, BSC)
       const aaveTokensFromOtherChains = await fetchAaveTokensFromBalances(
-        balancesResponse.balances
+        balancesWithOverrides
       )
 
       // Combine regular balances and Aave tokens for enrichment
