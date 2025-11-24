@@ -1,9 +1,10 @@
 "use client"
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
-import { ArrowUpRight, Check, Loader2 } from "lucide-react"
+import { ArrowUpRight, Check, ExternalLink, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
 import { isAddress } from "viem"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,6 +18,35 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { TokenBalance } from "@/services/dune-sim"
 import { formatTokenAmount } from "@/services/dune-sim"
+
+/**
+ * Get block explorer URL for a transaction hash based on chain ID
+ */
+function getExplorerTxUrl(chainId: number, txHash: string): string {
+  const explorers: Record<number, string> = {
+    1: "https://etherscan.io/tx/",
+    10: "https://optimistic.etherscan.io/tx/",
+    56: "https://bscscan.com/tx/",
+    100: "https://gnosisscan.io/tx/",
+    137: "https://polygonscan.com/tx/",
+    250: "https://ftmscan.com/tx/",
+    8453: "https://basescan.org/tx/",
+    34443: "https://explorer.mode.network/tx/",
+    42161: "https://arbiscan.io/tx/",
+    42220: "https://celoscan.io/tx/",
+    43114: "https://snowtrace.io/tx/",
+    57073: "https://explorer.testnet.soneium.org/tx/",
+    60808: "https://explorer.gobob.xyz/tx/",
+    84532: "https://sepolia.basescan.org/tx/",
+    7777777: "https://explorer.zora.energy/tx/",
+    360: "https://explorer.shape.network/tx/",
+    1868: "https://explorer.ramestta.com/tx/",
+    130: "https://explorer.engram.tech/tx/",
+    480: "https://worldscan.org/tx/"
+  }
+
+  return (explorers[chainId] || "https://etherscan.io/tx/") + txHash
+}
 
 interface SendOverlayProps {
   open: boolean
@@ -117,7 +147,8 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
 
       const isNativeToken =
         !selectedToken.address ||
-        selectedToken.address === "0x0000000000000000000000000000000000000000"
+        selectedToken.address === "0x0000000000000000000000000000000000000000" ||
+        selectedToken.address.toLowerCase() === "native"
 
       console.log("Sending transaction:", {
         amount,
@@ -205,6 +236,32 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
       setTxHash(txHash)
       setSuccess(true)
 
+      // Show success toast with explorer link
+      const explorerUrl = getExplorerTxUrl(selectedToken.chain_id, txHash)
+      toast.success(
+        <div className="flex flex-col gap-2">
+          <div>
+            <p className="font-semibold">Transaction Sent!</p>
+            <p className="text-sm text-foreground/70">
+              {amount} {selectedToken.symbol} sent to {recipientAddress.slice(0, 6)}...
+              {recipientAddress.slice(-4)}
+            </p>
+          </div>
+          <Button
+            variant="neutral"
+            size="sm"
+            onClick={() => window.open(explorerUrl, "_blank", "noopener,noreferrer")}
+            className="w-full gap-2"
+          >
+            <ExternalLink className="h-4 w-4" />
+            View on Explorer
+          </Button>
+        </div>,
+        {
+          duration: 10000
+        }
+      )
+
       // Call success callback
       if (onSuccess) {
         onSuccess()
@@ -249,19 +306,17 @@ export function SendOverlay({ open, onOpenChange, tokens, onSuccess }: SendOverl
                 <p className="text-sm text-foreground/50 mb-4">
                   Your transaction has been submitted successfully.
                 </p>
-                {txHash && (
+                {txHash && selectedToken && (
                   <Button
                     variant="neutral"
                     size="sm"
                     onClick={() => {
-                      window.open(
-                        `https://etherscan.io/tx/${txHash}`,
-                        "_blank",
-                        "noopener,noreferrer"
-                      )
+                      const explorerUrl = getExplorerTxUrl(selectedToken.chain_id, txHash)
+                      window.open(explorerUrl, "_blank", "noopener,noreferrer")
                     }}
                     className="gap-2"
                   >
+                    <ExternalLink className="h-4 w-4" />
                     View on Explorer
                   </Button>
                 )}

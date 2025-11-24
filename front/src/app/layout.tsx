@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import localFont from "next/font/local"
 import { ThemeProvider } from "next-themes"
 import { DynamicProvider } from "@/components/dynamic-provider"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 /* Satoshi Font */
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className={`${SATOSHI.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <DynamicProvider>{children}</DynamicProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
